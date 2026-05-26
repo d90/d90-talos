@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: databasus
+  namespace: databasus
+  annotations:
+    gethomepage.dev/href: "https://databasus.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: Database backup manager
+    gethomepage.dev/group: Infrastructure
+    gethomepage.dev/icon: sh-databasus
+    gethomepage.dev/name: Databasus
+    gethomepage.dev/pod-selector: ""
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`databasus.d90.name`)
+      kind: Rule
+      services:
+        - name: databasus-service
+          kind: Service
+          port: 4005
+  tls:
+    secretName: tls.databasus

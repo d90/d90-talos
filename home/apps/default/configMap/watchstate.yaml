@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: watchstate
+  namespace: default
+data:
+  WS_CRON_IMPORT: '1'
+  WS_CRON_EXPORT: '1'
+  WS_CRON_PUSH: '1'
+  WS_DISABLE_HTTP: '0'
+  WS_DISABLE_CRON: '0'
+  WS_DISABLE_CACHE: '0'
+  WS_TZ: America/New_York

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app watchstate
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      containers:
+        - imagePullPolicy: Always
+          name: *app
+          volumeMounts:
+            - name: nfs-conf
+              mountPath: /config
+              subPath: watchstate/
+          image: ghcr.io/arabcoders/watchstate@sha256:47143eaa49135dfcdb3bbc351046c81ec1cfa7bf3c6a0141b08ed7b9c32b03d7
+          envFrom:
+            - prefix: ''
+              configMapRef:
+                name: watchstate
+                optional: false               
+      restartPolicy: Always
+      volumes:
+        - name: nfs-conf
+          persistentVolumeClaim: 
+            claimName: nfs-pvc-containerdata
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+

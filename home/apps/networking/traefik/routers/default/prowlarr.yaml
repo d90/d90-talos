@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: &app prowlarr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://prowlarr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: prowlarr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: prowlarr.png
+    gethomepage.dev/name: prowlarr
+    gethomepage.dev/widget.type: "prowlarr"
+    gethomepage.dev/widget.url: "http://prowlarr:9696"
+    gethomepage.dev/widget.key: "21dfbf137f3b4c91a7ee677756cfdd49"
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`prowlarr.d90.name`)
+    kind: Rule
+    services:
+    - name: *app
+      kind: Service
+      port: 9696
+  tls:
+    secretName: tls.prowlarr

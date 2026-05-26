@@ -1,0 +1,152 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: una
+  namespace: default
+spec:
+  interval: 5m
+
+  chart:
+    spec:
+      chart: unifi
+      version: "26.5.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+    image:
+      repository: ghcr.io/goofball222/unifi
+      tag: 10.1.84@sha256:667bc178923f88fbe5630fecd29c965841bf6129e7b716dc614bc3eba6ee420c
+      pullPolicy: IfNotPresent
+    service:
+      main:
+        ports:
+          main:
+            protocol: https
+            port: 8443
+            targetPort: 8443
+      comm:
+        enabled: true
+        ports:
+          comm:
+            enabled: true
+            port: 8080
+            targetPort: 8080
+      stun:
+        enabled: true
+        ports:
+          stun:
+            enabled: true
+            port: 3478
+            targetPort: 3478
+            protocol: udp
+      speedtest:
+        enabled: true
+        ports:
+          speedtest:
+            enabled: true
+            port: 6789
+            targetPort: 6789
+      guestportal:
+        enabled: true
+        ports:
+          web:
+            enabled: true
+            port: 8880
+            targetPort: 8880
+            protocol: http
+          websecure:
+            enabled: true
+            port: 8843
+            targetPort: 8843
+            protocol: https
+    persistence:
+      config:
+        enabled: false
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        targetSelector:
+          main:
+            main:
+              mountPath: /usr/lib/unifi/olddata
+            migrate:
+              mountPath: /usr/lib/unifi/olddata
+      data:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        targetSelector:
+          main:
+            main:
+              mountPath: /usr/lib/unifi/data
+            migrate:
+              mountPath: /usr/lib/unifi/data
+      logs:
+        enabled: true 
+        mountPath: "/usr/lib/unifi/logs"
+        type: "emptyDir"
+      certs:
+        enabled: false
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""        
+        mountPath: "/usr/lib/unifi/cert"
+    
+    securityContext:
+      container:
+        readOnlyRootFilesystem: false
+        runAsGroup: 0
+        runAsUser: 0
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              env:
+                RUN_CHOWN: true
+                DB_MONGO_LOCAL: false
+                DB_MONGO_URI: mongodb://mongodb:27017/unifi
+                STATDB_MONGO_URI: mongodb://mongodb:27017/unifi_stat
+                UNIFI_DB_NAME: unifi
+          initContainers:
+            clearlock:
+              enabled: false
+              type: init
+              image: alpine:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - rm -f /usr/lib/unifi/data/db/mongod.lock
+              volumeMounts:
+                - name: data
+                  mountPath: /usr/lib/unifi/data          
+            migrate:
+              enabled: false
+              type: init
+              imageSelector: alpineImage
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - |
+                  newdatadir="/usr/lib/unifi/data"
+                  olddatadir="/usr/lib/unifi/olddata/data"
+                  # Check the dir exists
+                  [ ! -d "$newdatadir" ] && echo "$newdatadir missing" && exit 1
+                  # Check if there is a data/data dir to migrate
+                  [ ! -d "$olddatadir" ] && echo "No $olddatadir dir found. Migration skipped" && exit 0
+    
+                  # Check if the new data dir is empty, ignoring the old data dir
+                  dirs=$(ls -A "$newdatadir" | grep -v "data")
+                  if [ -n "$dirs" ]; then
+                    echo "New data dir is empty. Migrating data one level up"
+                    cp -rf $olddatadir/* $newdatadir || echo "Failed to move data" && exit 1
+                    echo "Data migration complete"
+                  fi

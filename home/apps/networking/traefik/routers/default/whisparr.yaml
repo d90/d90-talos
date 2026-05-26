@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: whisparr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://whisparr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: whisparr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: sh-whisparr
+    gethomepage.dev/name: whisparr
+    # gethomepage.dev/widget.type: "whisparr"
+    # gethomepage.dev/widget.url: "http://whisparr:6969/whisparr"
+    # gethomepage.dev/widget.key: "218fa8ec75454ee68bf636e9a5539dc9"
+    # gethomepage.dev/pod-selector: ""
+    # gethomepage.dev/weight: 10 # optional
+    # # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`whisparr.d90.name`)
+    kind: Rule
+    services:
+    - name: whisparr
+      kind: Service
+      port: 6969
+  tls:
+    secretName: tls.whisparr

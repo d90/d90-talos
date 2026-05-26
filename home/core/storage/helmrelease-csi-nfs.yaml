@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: csi-driver-nfs
+  namespace: flux-system
+spec:
+  interval: 5m
+  releaseName: csi-driver-nfs
+  chart:
+    spec:
+      chart: csi-driver-nfs
+      version: "4.13.1"
+      sourceRef:
+        kind: HelmRepository
+        name: csi-driver-nfs
+        namespace: flux-system
+  values:
+    image:
+      tag: "v4.11.0"
+    controller:
+      replicas: 1
+    node:
+      name: "csi-driver-nfs-node"   # <-- ADD THIS
+      # other node daemonset config overrides here
+    nfs:
+      server: 10.10.10.210
+      path: /containerData

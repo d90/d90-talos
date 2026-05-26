@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: profilarr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://profilarr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: profilarr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: profilarr.png
+    gethomepage.dev/name: profilarr
+    # gethomepage.dev/widget.type: "profilarr"
+    # gethomepage.dev/widget.url: "http://profilarr:8989/profilarr"
+    # gethomepage.dev/widget.key: "218fa8ec75454ee68bf636e9a5539dc9"
+    # gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`profilarr.d90.name`)
+    kind: Rule
+    services:
+    - name: profilarr
+      kind: Service
+      port: 6868
+  tls:
+    secretName: tls.profilarr

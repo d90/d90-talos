@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-os
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ports:
+    - name: https
+      port: 11443
+      targetPort: 11443
+  clusterIP: None
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: unifi-os
+  namespace: default
+subsets:
+  - addresses:
+      - ip: 10.10.100.86
+    ports:
+      - name: https
+        port: 11443
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: unifi-os
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://unifi-os.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Home Automation
+    gethomepage.dev/icon: sh-ubiquiti-unifi
+    gethomepage.dev/name: unifi-os
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`unifi-os.d90.name`)
+      kind: Rule
+      services:
+        - name: unifi-os
+          port: 11443
+          scheme: https
+          serversTransport: unifi-transport
+  tls:
+    secretName: tls.unifi-os
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.unifi-os
+  namespace: default
+spec:
+  dnsNames:
+    - unifi-os.d90.name
+  secretName: tls.unifi-os
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

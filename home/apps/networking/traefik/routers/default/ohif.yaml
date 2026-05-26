@@ -1,0 +1,24 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ohif
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://ohif.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: ohif
+    gethomepage.dev/group: Medical
+    gethomepage.dev/icon: 
+    gethomepage.dev/name: ohif
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`ohif.d90.name`)
+    kind: Rule
+    services:
+    - name: ohif
+      kind: Service
+      port: 80
+  tls:
+    secretName: tls.ohif

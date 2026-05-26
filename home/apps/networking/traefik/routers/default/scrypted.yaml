@@ -1,0 +1,26 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: scrypted
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://scrypted.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: scrypted
+    gethomepage.dev/group: Network
+    gethomepage.dev/icon: scrypted.png
+    gethomepage.dev/name: scrypted
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`scrypted.d90.name`)
+    kind: Rule
+    services:
+    - name: scrypted
+      kind: Service
+      port: 10443
+      # port: 10611
+      scheme: https
+  tls:
+    secretName: tls.scrypted

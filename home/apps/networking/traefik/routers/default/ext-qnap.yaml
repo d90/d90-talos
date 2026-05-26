@@ -1,0 +1,174 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qnap
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: https  # <--- ADD THIS
+spec:
+  ports:
+    - name: https # It is good practice to name this 'https' as well
+      port: 443
+      targetPort: 443
+  clusterIP: None
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: qnap
+  namespace: default
+subsets:
+  - addresses:
+      - ip: 10.10.10.210
+    ports:
+      - name: https
+        port: 443
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: qnap
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://nas.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Network
+    gethomepage.dev/icon: sh-qnap
+    gethomepage.dev/name: QNAP Nas
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`nas.d90.name`)
+      kind: Rule
+      services:
+      - name: qnap
+        port: 443
+  tls:
+    secretName: tls.qnap
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.qnap
+  namespace: default
+spec:
+  dnsNames:
+    - nas.d90.name
+  secretName: tls.qnap
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer
+---
+apiVersion: v1
+data:
+    id_ed25519: ENC[AES256_GCM,data:mtsogs89usdR72yfDuXb5QLHHsc8oV/FSbMO52oWGAolTDQIO0vtpNU4IZxBCAVecAGyrzyiw7OaW12f9BA3IRWzHbaZw4CvUwWBoS6YEFQCOVCxrT2jWql9I4/abswK4jwJmKNH0f8EuGCWWzsFelygPZ/Rq3u2RMDcNlYj5PGUPzXGk4tG0g0Eo0HOkuC5Wv6U+NimXoxk1tTCWh7M/r+RweXWOGjrhBea38p15t2g3Ks9nlzo0gSe+nU3BoMX96KOmz7M7YtTLTeOKmNHVYMdF3Cs4asLi7CkjZjg87nCU0krJbNr2KBQbpfN2j753w6ABVHIXbNj2mtBpUk97LkdXTIRKuKiHlFQF9HWDzI1FwxUMb1WvCTAE0IltstCsg+4jzLcUD2GrTQkZtJNlCphigzhF0889XaAzyc+0FxmElfWhv0ivxBWYvrxr/m06yjEdMQFLKhQubNTJy3ALpogHW9FjAzKoB7xKKBPYGwdIcBdK/Qxf8+59OOp2+ksgly4JWP/yGbbsj6+oPsAnAQoYYCDCD4LLojy7J6R/HvHfvKkb/kkESkNYy0AnqvMITV3JvufBOgpZRkR3eFbLVRmKwFDmAronQfMRu2yM0Pu2J9pWsE/vlNUPBcZ0r11jERMsuXi0Wc8nThfmXlJGc2bzYSVRkSU18udash8mNjaL5yZRuN/afitixMemHwBK2LEENNPfzoDX2aBZ9QfgomPkUM=,iv:2x8JNkKKAyhxUoEBBC9a60nlgGvrEaPMr1baU2vl/CM=,tag:3WTW5dYOeWSCxaXdpp437Q==,type:str]
+kind: Secret
+metadata:
+    creationTimestamp: null
+    name: qnap-ssh-key
+    namespace: default
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBpWDdmYkUwS3FxN1MwWlB5
+            dEtDbnVGTXA5Y1BpaW1NNllDVm81WC8yVzE0CmYxYmx3QzNBSDhacTJGLzhUTVd3
+            ZG1GVFU2Szk2N2RQb3JPSFF2L21RRTgKLS0tIDMvN0V4UjJKSklOR3lkejhyYzFR
+            Y3NJSUZZQ3FKTjNxRGo4dHp3ZDZkdzAKnKAvO1/e3xgW7WVZYCllvBfgcv4Tvw5c
+            kFRe2X+3yK5TcqJ4rB3W4olDUvQrEKJqkNY4qmxShlnjxkgtQarWSg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-01-14T13:46:37Z"
+    mac: ENC[AES256_GCM,data:+5ACAjAfQ3F0LG1EHqPgczaibCjnL2EHsC4n2tyrK+bjHd7EBTFiLEFGDHhaQ9AAWjzs2dcS//Vq95inOim1yIJc+DeIwZ1Ybal7WazV76AUJ90y+wwjTeqi6OjMt3ej9Va94z6ibp9ZF8pcvl9znc/Rj0puxV43aSVQd8Pc8dc=,iv:mxAa/YueK2DG/KStLUn05q2fzU9VKB0h1a+nF+fEF40=,tag:6uMfuQh97TdglrSzjWvIQw==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.9.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qnap-cert-sync
+  namespace: default
+  annotations:
+    # This tells Reloader to watch any ConfigMap or Secret mounted in this deployment
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: qnap-cert-sync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qnap-cert-sync
+  template:
+    metadata:
+      labels:
+        app: qnap-cert-sync
+    spec:
+      containers:
+      - name: syncer
+        image: alpine:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "[$(date)] Container started. Preparing to sync..."
+
+            # 1. Install SSH Client
+            apk add --no-cache openssh-client
+
+            # 2. Setup SSH Identity
+            mkdir -p /root/.ssh
+            cp /etc/ssh-key/id_ed25519 /root/.ssh/id_ed25519
+            chmod 600 /root/.ssh/id_ed25519
+            echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+            # 3. Format Certificate (Key + Cert)
+            # Ensure there is a newline between them
+            cat /etc/certs/tls.key > /tmp/stunnel.pem
+            echo "" >> /tmp/stunnel.pem
+            cat /etc/certs/tls.crt >> /tmp/stunnel.pem
+
+            # 4. Push to QNAP
+            echo "Pushing certificate to 10.10.10.210..."
+            scp /tmp/stunnel.pem admin@10.10.10.210:/tmp/stunnel.new
+
+            # 5. Remote Apply
+            # We use 'cp' to the persistent path only; the symlink handles /etc/
+            ssh admin@10.10.10.210 << 'EOF'
+              set -e
+              PERSIST="/mnt/HDA_ROOT/.config/stunnel/stunnel.pem"
+              
+              echo "Moving new cert to persistent storage..."
+              mv /tmp/stunnel.new $PERSIST
+              chmod 600 $PERSIST
+
+              echo "Restarting QNAP Services..."
+              /etc/init.d/stunnel.sh restart
+              /etc/init.d/Qthttpd.sh restart
+              echo "Done."
+            EOF
+            
+            echo "[$(date)] Sync complete. Sleeping until next Reloader trigger..."
+            exec tail -f /dev/null
+        volumeMounts:
+        - name: cert-volume
+          mountPath: "/etc/certs"
+          readOnly: true
+        - name: ssh-volume
+          mountPath: "/etc/ssh-key"
+          readOnly: true
+      volumes:
+      - name: cert-volume
+        secret:
+          secretName: tls.qnap # Reloader watches this
+      - name: ssh-volume
+        secret:
+          secretName: qnap-ssh-key    

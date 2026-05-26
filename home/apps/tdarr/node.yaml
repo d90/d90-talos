@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tdarr-node
+  namespace: tdarr
+  labels:
+    app: tdarr-node
+  annotations:
+    fluxcd.io/automated: "true"
+spec:
+  replicas: 4 
+  selector:
+    matchLabels:
+      app: tdarr-node
+  template:
+    metadata:
+      labels:
+        app: tdarr-node
+    spec:
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+      # Security context at the pod level for group permissions
+      securityContext:
+        supplementalGroups: [44, 109, 1000] # 44=video, 109=render (Debian Trixie defaults)
+      containers:
+      - name: tdarr-node
+        image: ghcr.io/haveagitgat/tdarr_node@sha256:62e14509bc19dea9b6f5dc85d0942163b6fa240d780a53eb590d894d46c9e1f2
+        env:
+          - name: NODE_ENV
+            value: "production"
+          - name: GPU_ENABLED
+            value: "true"
+          - name: serverIP
+            value: "tdarr"
+        resources:
+          # This is the "secret sauce" for K3s Intel GPU integration
+          limits:
+            gpu.intel.com/i915: 1
+          requests:
+            gpu.intel.com/i915: 1
+        volumeMounts:
+          - name: dev-dri
+            mountPath: /dev/dri
+          - name: nfs-data
+            mountPath: /data
+        securityContext:
+          privileged: true 
+      volumes:
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+        - name: nfs-data
+          persistentVolumeClaim:
+            claimName: nfs-pvc-data-tdarr
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - jellyfin
+              topologyKey: "kubernetes.io/hostname"

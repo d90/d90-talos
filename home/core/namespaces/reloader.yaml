@@ -1,0 +1,5 @@
+# Namespace for Tdarr
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: reloader
