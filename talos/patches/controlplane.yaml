@@ -1,0 +1,13 @@
+# Talos machine config patch - controlplane nodes
+# See MIGRATION_STRATEGY.md for full values
+machine:
+  network:
+    interfaces:
+      - interface: eth0
+        dhcp: true
+        vip:
+          ip: 10.10.100.101   # temp VIP during migration; swap to .100 at cutover
+  install:
+    extensions: []            # populate with i915, intel-ucode, mei image refs
+cluster:
+  allowSchedulingOnControlPlanes: true

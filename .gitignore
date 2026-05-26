@@ -1,0 +1,5 @@
+secrets.yaml
+talos/secrets.yaml
+.env
+*.decrypted.*
+kubeconfig*
