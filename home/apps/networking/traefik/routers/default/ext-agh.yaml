@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agh
+  namespace: default
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  clusterIP: None
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: agh
+  namespace: default
+subsets:
+  - addresses:
+      - ip: 10.10.10.231
+    ports:
+      - port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: agh
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://agh.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Network
+    gethomepage.dev/icon: adguard-home
+    gethomepage.dev/name: adguard
+    gethomepage.dev/widget.type: "adguard"
+    gethomepage.dev/widget.url: "https://agh.d90.name"
+    gethomepage.dev/widget.username: "d90"
+    gethomepage.dev/widget.password: "fY2z48I&S6XGU%pX"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`agh.d90.name`)
+      kind: Rule
+      services:
+        - name: agh
+          port: 80
+  tls:
+    secretName: tls.agh
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.agh
+  namespace: default
+spec:
+  dnsNames:
+    - agh.d90.name
+  secretName: tls.agh
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer
+

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto-lb
+  namespace: default
+  annotations:
+    # If you have multiple MetalLB pools, specify which one to use here
+    # metallb.universe.tf/address-pool: production-pool 
+spec:
+  # 1. DEFINE YOUR STATIC IP HERE
+  loadBalancerIP: 10.10.100.81  
+  
+  selector:
+    app.kubernetes.io/instance: mosquitto
+    app.kubernetes.io/name: mosquitto 
+  type: LoadBalancer
+  ports:
+    - name: mqtt-tcp
+      port: 1883
+      targetPort: 1883
+      protocol: TCP
+    - name: mqtt-web
+      port: 9001
+      targetPort: 9001
+      protocol: TCP

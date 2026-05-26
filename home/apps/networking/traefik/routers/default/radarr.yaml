@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: &app radarr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://radarr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: radarr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: radarr.png
+    gethomepage.dev/name: radarr
+    gethomepage.dev/widget.type: "radarr"
+    gethomepage.dev/widget.url: "http://radarr:7878/radarr"
+    gethomepage.dev/widget.key: "5536386ed8fb4e5d98861e40501f220e"
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`radarr.d90.name`)
+    kind: Rule
+    services:
+    - name: *app
+      kind: Service
+      port: 7878
+  tls:
+    secretName: tls.radarr
+

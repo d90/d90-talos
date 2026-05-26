@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: una
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://una.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: una
+    gethomepage.dev/group: Network
+    gethomepage.dev/icon: sh-ubiquiti-unifi
+    gethomepage.dev/name: Unifi Netowrk Application
+    # gethomepage.dev/widget.type: unifi
+    # gethomepage.dev/widget.url: http://unifi:8443
+    # gethomepage.dev/widget.username:
+    # gethomepage.dev/widget.password:
+
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`una.d90.name`)
+    kind: Rule
+    services:
+    - name: una-unifi
+      kind: Service
+      port: 8443
+      scheme: https
+      # serversTransport: una-transport
+  tls:
+    secretName: tls.una

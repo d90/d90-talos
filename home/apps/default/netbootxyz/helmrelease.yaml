@@ -1,0 +1,152 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netbootxyz
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: netbootxyz
+      version: "8.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+  values:
+
+    # ───────────────────────────────────────────────
+    # Disable metrics to avoid ServiceMonitor CRDs
+    # ───────────────────────────────────────────────
+    metrics:
+      main:
+        enabled: false
+        serviceMonitor:
+          enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable built-in ingress
+    # ───────────────────────────────────────────────
+    ingress:
+      main:
+        enabled: false
+      assets:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Service definition
+    # ───────────────────────────────────────────────
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 10612
+            targetPort: 3000
+      assets:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 10.10.100.82
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "netbootxyz-10.10.100.82"
+        ports:
+          assets:
+            enabled: true
+            protocol: http
+            port: 80
+            targetPort: 80
+      tftp:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 10.10.100.82
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "netbootxyz-10.10.100.82"
+        ports:
+          tftp:
+            enabled: true
+            protocol: udp
+            port: 69
+            targetPort: 69
+
+    # ───────────────────────────────────────────────
+    # Persistence
+    # ───────────────────────────────────────────────
+    persistence:
+      config:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        mountPath: /config
+      assets:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        mountPath: /assets
+
+    # ───────────────────────────────────────────────
+    # Image
+    # ───────────────────────────────────────────────
+    image:
+      repository: ghcr.io/netbootxyz/netbootxyz
+      tag: 0.7.6-nbxyz2@sha256:c0f6be6d49a5d5df6620332bd582e56c95a091a3f60a25133b19f6d686e1fa39
+      pullPolicy: IfNotPresent
+
+    # ───────────────────────────────────────────────
+    # Workload
+    # ───────────────────────────────────────────────
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+        podSpec:
+          securityContext:
+            container:
+              readOnlyRootFilesystem: false
+              runAsNonRoot: false
+              runAsUser: 0
+              runAsGroup: 0
+              capabilities:
+                add:
+                  - SYS_CHROOT
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+              env:
+                MENU_VERSION: ""
+                TFTPD_OPTS: "--tftp-single-port"
+              ports:
+                - name: main
+                  containerPort: 3000
+                - name: assets
+                  containerPort: 80
+                - name: tftp
+                  containerPort: 69
+                  protocol: udp
+              probes:
+                readiness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                liveness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                startup:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main

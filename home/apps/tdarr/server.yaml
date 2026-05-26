@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tdarr
+  namespace: tdarr
+  labels:
+    app: tdarr
+  annotations:
+    fluxcd.io/automated: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tdarr
+  template:
+    metadata:
+      labels:
+        app: tdarr
+    spec:
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+      containers:
+      - name: tdarr
+        image: ghcr.io/haveagitgat/tdarr@sha256:20a5656c4af4854e1877046294f77113f949d27e35940a9a65f231423d063207
+        env:
+          - name: NODE_ENV
+            value: "production"
+        volumeMounts:
+          - name: nfs-data
+            mountPath: /data
+          - name: nfs-conf
+            mountPath: /app/server
+            subPath: tdarr/server
+          - name: nfs-conf
+            mountPath: /app/configs
+            subPath: tdarr/configs
+          - name: nfs-conf
+            mountPath: /app/logs
+            subPath: tdarr/logs
+          - name: nfs-conf
+            mountPath: /temp
+            subPath: tdarr/transcode_cache          
+          # Mount the host's /dev/dri into the container
+          - name: dri
+            mountPath: /dev/dri
+        # Depending on your image and host configuration, you might need to run with additional privileges:
+      volumes:
+        - name: nfs-data
+          persistentVolumeClaim:
+            claimName: nfs-pvc-data-tdarr
+        - name: nfs-conf
+          persistentVolumeClaim: 
+            claimName: nfs-pvc-containerdata-tdarr
+        # Define the hostPath volume for /dev/dri
+        - name: dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - jellyfin
+              topologyKey: "kubernetes.io/hostname"

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scrypted
+  namespace: default
+data:
+  SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer SET_THIS_TO_SOME_RANDOM_TEXT
+  SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+

@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.tasmo
+  namespace: default
+spec:
+  dnsNames:
+    - tasmo.d90.name
+  secretName: tls.tasmo
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app webnettools
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      containers:
+        - imagePullPolicy: Always
+          name: *app
+          image: johannesschafer/webnettools
+          stdin: false
+          stdinOnce: false
+          tty: false
+      restartPolicy: Always
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate

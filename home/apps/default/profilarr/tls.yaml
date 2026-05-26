@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.profilarr
+  namespace: default
+spec:
+  dnsNames:
+    - profilarr.d90.name
+  secretName: tls.profilarr
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

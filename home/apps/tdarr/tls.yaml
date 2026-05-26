@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.tdarr
+  namespace: tdarr
+spec:
+  dnsNames:
+    - tdarr.d90.name
+  secretName: tls.tdarr
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

@@ -1,0 +1,129 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tasmoadmin
+  namespace: default
+spec:
+  interval: 5m
+  timeout: 20m
+  chart:
+    spec:
+      chart: tasmoadmin
+      version: "13.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+
+    # ───────────────────────────────────────────────
+    # Disable metrics to avoid ServiceMonitor CRDs
+    # ───────────────────────────────────────────────
+    metrics:
+      main:
+        enabled: false
+        serviceMonitor:
+          enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable built-in ingress
+    # ───────────────────────────────────────────────
+    ingress:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Service definition
+    # ───────────────────────────────────────────────
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 80
+            targetPort: 80
+
+    persistence:
+      config:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        mountPath: /data
+
+    # ───────────────────────────────────────────────
+    # tasmoadmin Image
+    # ───────────────────────────────────────────────
+    image:
+      repository: ghcr.io/tasmoadmin/tasmoadmin
+      tag: "v4.3.4@sha256:9d0869cb47d7d525f69ca555708c00b52dd899acc02e4d3e268bd949e29bb6fd"
+      pullPolicy: IfNotPresent
+
+    # ───────────────────────────────────────────────
+    # Workload + PRODUCTION-GRADE PROBES
+    # ───────────────────────────────────────────────
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+
+        podSpec:
+          securityContext:
+            container:
+            readOnlyRootFilesystem: false
+
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+
+              # Correct container port
+              ports:
+                - name: main
+                  containerPort: 9541
+              # ───────────────────────────────────────
+              # STABLE PROBES FOR NFS + LARGE LIBRARIES
+              # ───────────────────────────────────────
+
+              probes:
+                # tasmoadmin becomes ready long before it is fully scanned
+                readiness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 12   # ~2 minutes
+                  successThreshold: 1
+
+                # Liveness probe must be gentle — tasmoadmin can stall briefly
+                liveness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  initialDelaySeconds: 30
+                  periodSeconds: 20
+                  timeoutSeconds: 2
+                  failureThreshold: 10   # ~3 minutes
+                  successThreshold: 1
+
+                # Startup probe prevents container kills during long boot
+                startup:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 90   # 15 minutes startup window

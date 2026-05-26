@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: sonarr-postgres
+  namespace: default
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:14
+  storage:
+    storageClass: nfs-client
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: sonarr
+      owner: sonarr
+      secret:
+        name: sonarr-postgres-secret
+      postInitSQL:
+        - CREATE DATABASE "sonarr-log" OWNER sonarr;
+  superuserSecret:
+    name: sonarr-postgres-secret
+  monitoring:
+    enablePodMonitor: true

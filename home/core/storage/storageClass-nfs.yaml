@@ -1,0 +1,16 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
+mountOptions:
+  - vers=4
+  - tcp
+parameters:
+  pathPattern: "${.PVC.namespace}/${.PVC.name}"
+  onDelete: delete
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: false

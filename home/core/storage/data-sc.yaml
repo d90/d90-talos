@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: data-sc
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: "10.10.10.210"     # Your NAS address
+  share: "/data"            # The exported path on your NAS
+  # "subPath" is how the CSI driver handles subfolders
+  # to isolate each PVC.
+  subPath: ""    
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

@@ -1,0 +1,23 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hass
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://hass.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Home Automation
+    gethomepage.dev/icon: sh-home-assistant
+    gethomepage.dev/name: Home Assistant
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`hass.d90.name`)
+    kind: Rule
+    services:
+    - name: home-assistant
+      kind: Service
+      port: 8123
+  tls:
+    secretName: tls.hass

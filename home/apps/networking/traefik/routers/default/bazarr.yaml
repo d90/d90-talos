@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: &app bazarr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://bazarr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: bazarr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: bazarr.png
+    gethomepage.dev/name: bazarr
+    gethomepage.dev/widget.type: "bazarr"
+    gethomepage.dev/widget.url: "http://bazarr:6767"
+    gethomepage.dev/widget.key: "07359a9ee168bc3c8ec6bef9e53db6b4"
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`bazarr.d90.name`)
+    kind: Rule
+    services:
+    - name: *app
+      kind: Service
+      port: 6767
+  tls:
+    secretName: tls.bazarr

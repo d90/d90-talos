@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sonarr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://sonarr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: sonarr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: sonarr.png
+    gethomepage.dev/name: sonarr
+    gethomepage.dev/widget.type: "sonarr"
+    gethomepage.dev/widget.url: "http://sonarr:8989/sonarr"
+    gethomepage.dev/widget.key: "218fa8ec75454ee68bf636e9a5539dc9"
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`sonarr.d90.name`)
+    kind: Rule
+    services:
+    - name: sonarr
+      kind: Service
+      port: 8989
+  tls:
+    secretName: tls.sonarr

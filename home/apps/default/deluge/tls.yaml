@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.deluge
+  namespace: default
+spec:
+  dnsNames:
+    - deluge.d90.name
+  secretName: tls.deluge
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

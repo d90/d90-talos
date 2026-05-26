@@ -1,0 +1,150 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellyfin
+  namespace: default
+spec:
+  interval: 5m0s
+
+  chart:
+    spec:
+      chart: jellyfin
+      version: "22.2.33" 
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h0m0s
+
+  values:
+    # ─── Disable built-in ingress via ingress.main ─── #
+    ingress:
+      main:
+        enabled: false
+
+    # ─── Mirror your existing Service via service.main ─── #
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 8096
+            targetPort: 8096
+    # ─── Persistence (PVCs & hostPath) ─── #
+    persistence:
+      media: # where the media lives
+        enabled: true
+        type: pvc
+        existingClaim: nfs-pvc-data
+        mountPath: /media
+      data:   
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi              # ← request a 10 Gi volume
+        existingClaim: ""
+        mountPath: /data
+      config:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi              # ← request a 10 Gi volume
+        existingClaim: ""
+        mountPath: /config
+      tmp:
+        enabled: true
+        type: emptyDir
+        mountPath: /tmp
+        size: 4Gi          # >= 2Gi to satisfy Jellyfin's startup check
+      logs:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi              # ← request a 10 Gi volume
+        existingClaim: ""
+        mountPath: /logs     
+# added persistent location for cache and transcode        
+      cache:
+        enabled: true
+        mountPath: "/cache"
+        type: "emptyDir"
+      transcode:
+        enabled: true
+        mountPath: "/config/transcodes"
+        type: "emptyDir"
+      dev-dri:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/dri
+        mountPath: /dev/dri
+
+    # ─── Workload via workload.main ─── #
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+        podSpec:
+          nodeSelector:
+            intel.feature.node.kubernetes.io/gpu: "true"
+          securityContext:
+            privileged: true
+            supplementalGroups: 
+              - "109"  
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+
+              # Define the HTTP port
+              ports:
+                - name: main
+                  containerPort: 8096
+
+              # Probes using the TrueCharts common-library DSL
+              probes:
+                liveness:
+                  enabled: true
+                  type: http
+                  port: 8096
+                  path: /health
+                  spec:
+                    initialDelaySeconds: 60
+                    periodSeconds: 10
+                    failureThreshold: 5
+                readiness:
+                  enabled: true
+                  type: http
+                  port: 8096
+                  path: /health
+                  spec:
+                    initialDelaySeconds: 10
+                    periodSeconds: 5
+                    failureThreshold: 3
+                startup:
+                  enabled: true
+                  type: http
+                  port: 8096
+                  path: /health
+                  spec:
+                    initialDelaySeconds: 15
+                    periodSeconds: 10
+                    failureThreshold: 6
+
+              resources:
+                requests:
+                  cpu: "2500m"
+                  memory: "4000Mi"
+                  gpu.intel.com/i915: "1"
+                limits:
+                  cpu: "3500m"
+                  memory: "6000Mi"
+                  gpu.intel.com/i915: 1
+
+
+
