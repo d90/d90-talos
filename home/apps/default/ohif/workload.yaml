@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ohif
+  annotations:
+    {}
+  labels:
+    app: ohif
+    app.kubernetes.io/name: ohif
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: ohif
+  template:
+    metadata:
+      labels:
+        app: ohif  
+    spec:
+      containers:
+        - imagePullPolicy: Always
+          name: ohif
+          volumeMounts:
+          image: ohif/app:latest
+          stdin: false
+          stdinOnce: false
+          tty: false 
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate

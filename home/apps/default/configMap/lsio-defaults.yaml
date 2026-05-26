@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: lsio-defaults
+    namespace: default
+data:
+    PGID: ENC[AES256_GCM,data:Qspl5g==,iv:JzgXkA3eZ1TPH8hXsgKoceP6WDG8Ak8RrdWVX7iVhNw=,tag:k20nNccFo/gQ0XcewZM/Vg==,type:str]
+    PUID: ENC[AES256_GCM,data:odCLvA==,iv:nZ3qdQgTqRCU3jse1kZacW9cElvC29v/l6SlIS9Uxz4=,tag:yqhssxERfsNvDlfbvqWnDA==,type:str]
+    TZ: ENC[AES256_GCM,data:VdjX/ym2vGRbhFSGya/lpw==,iv:AB34klO1eWGf7h3Mbo3oX5b7EVCbJyWlDr0iMdekVEQ=,tag:MlNxSZb5VxOVc6OXF+UALA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRbUVNTmdTZDBFb2FNc2di
+            YlJRTSs5L090bzJtQThMWmN5dWVrcHJHUDNJCmUxbWhFZ2p0NUJCcDZDM0xtcytK
+            dVV1bithQ0w3VEJacWZ6TWhFSjIrVEEKLS0tIGJrR1ZlR0hDY0pOMnZWSE9SZzFS
+            ZEdrZzNLTUpia2NpQjArVXpVS2F3MVEKNyIijPhPyqxWdGgXPUGLVBsBYNb6Icfu
+            Q/ThxT8eFKRNqIIMXl3B2Z5XGTJ6ptFyP1cUfJ7bTzS9O6G+qYCRSQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-11-28T18:53:25Z"
+    mac: ENC[AES256_GCM,data:M1hijdely/jlZJkcrcSLfyiFJoqOhRf/GQtYrSDT6+3NHOWm0NU9y2ZNEhXL+RfvSsdIu0m7YHGImrsIsQHJ2uBqwDNHb/xb2Fv9G7r5TMjCGAmX1MXrym3PveMiU3kEQHoQ99NhGbA+O5TU7u66B8c5fkNhjJ+8K7V+CfHZ5fs=,iv:seHAEP/UQP4zweaykz/mBth4tqwB4/CQK4NDYLnoTYI=,tag:jFkwGc2SEVxnrwn5Ox10FA==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|Data)$
+    version: 3.7.3

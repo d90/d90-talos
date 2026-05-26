@@ -1,0 +1,634 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homepage
+  namespace: default
+spec:
+  interval: 5m
+
+  chart:
+    spec:
+      chart: homepage
+      version: "12.5.1" # Ensure this matches the available homepage chart version in your repo
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+      
+  values:
+    image:
+      repository: ghcr.io/gethomepage/homepage
+      tag: v1.10.1@sha256:0b596092c0b55fe4c65379a428a3fe90bd192f10d1b07d189a34fe5fabe7eedb
+      pullPolicy: IfNotPresent
+    
+    workload:
+      main:
+        podSpec:
+          automountServiceAccountToken: true
+          containers:
+            main:
+              env:
+                # Set this to your host (example: home.mydomain.com)
+                HOMEPAGE_ALLOWED_HOSTS: "*"
+          initContainers:
+            init-config:
+              enabled: false
+              type: init
+              imageSelector: alpineImage
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mkdir -p /app/config
+                  if [ ! -f /app/config/bookmarks.yaml ]; then
+                    echo "Bookmarks file not found, copying dummy..."
+                    cp /dummy-config/bookmarks.yaml /app/config/bookmarks.yaml
+                    echo "Config file copied, you can now edit it at /app/config/bookmarks.yaml"
+                  fi
+                  if [ ! -f /app/config/services.yaml ]; then
+                    echo "services file not found, copying dummy..."
+                    cp /dummy-config/services.yaml /app/config/services.yaml
+                    echo "Config file copied, you can now edit it at /app/config/services.yaml"
+                  fi
+                  if [ ! -f /app/config/settings.yaml ]; then
+                    echo "settings file not found, copying dummy..."
+                    cp /dummy-config/settings.yaml /app/config/settings.yaml
+                    echo "Config file copied, you can now edit it at /app/config/settings.yaml"
+                  fi
+                  if [ ! -f /app/config/widgets.yaml ]; then
+                    echo "widgets file not found, copying dummy..."
+                    cp /dummy-config/widgets.yaml /app/config/widgets.yaml
+                    echo "Config file copied, you can now edit it at /app/config/widgets.yaml"
+                  fi
+                  if [ ! -f /app/config/custom.css ]; then
+                    echo "custom.css file not found, copying dummy..."
+                    cp /dummy-config/custom.css /app/config/custom.css
+                    echo "Config file copied, you can now edit it at /app/config/custom.css"
+                  fi
+                  if [ ! -f /app/config/custom.js ]; then
+                    echo "custom.js file not found, copying dummy..."
+                    cp /dummy-config/custom.js /app/config/custom.js
+                    echo "Config file copied, you can now edit it at /app/config/custom.js"
+                  fi
+    service:
+      main:
+        ports:
+          main:
+            port: 10352
+            protocol: http
+            targetPort: 3000
+    persistence:
+      config:
+        enabled: true
+        type: emptyDir
+        mountPath: /app/config
+        # medium: Memory
+        # storageClass: nfs-client
+        # size: 10Gi
+        # existingClaim: ""
+
+        # targetSelector:
+        #   main:
+        #     main: {}
+        #     init-config: {}
+      images:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        existingClaim: "" # <--- Verify this name via 'kubectl get pvc'
+        mountPath: /app/public/images   # Where the web server looks for files
+        readOnly: true        
+        
+      kubernetes-config:
+        enabled: true
+        mountPath: /app/config/kubernetes.yaml
+        subPath: kubernetes.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      bookmarks-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/bookmarks.yaml
+        subPath: bookmarks.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-bookmarks-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/bookmarks.yaml
+        subPath: bookmarks.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      settings-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/settings.yaml
+        subPath: settings.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-settings-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/settings.yaml
+        subPath: settings.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      services-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/services.yaml
+        subPath: services.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-services-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/services.yaml
+        subPath: services.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      widgets-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/widgets.yaml
+        subPath: widgets.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-widgets-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/widgets.yaml
+        subPath: widgets.yaml
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      custom-css-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/custom.css
+        subPath: custom.css
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-custom-css-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/custom.css
+        subPath: custom.css
+        readOnly: true
+        type: "configmap"
+        objectName: config
+      custom-js-config:
+        # Only enable when not using forceConfigFromValues
+        enabled: "{{ not .Values.forceConfigFromValues }}"
+        mountPath: /dummy-config/custom.js
+        subPath: custom.js
+        readOnly: true
+        type: "configmap"
+        objectName: config
+        targetSelector:
+          main:
+            init-config: {}
+      force-custom-js-config:
+        # Only enable when using forceConfigFromValues
+        enabled: "{{ .Values.forceConfigFromValues }}"
+        mountPath: /app/config/custom.js
+        subPath: custom.js
+        readOnly: true
+        type: "configmap"
+        objectName: config
+    
+    serviceAccount:
+      main:
+        enabled: true
+        primary: true
+    
+    podOptions:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "3"
+    
+    configmap:
+      config:
+        enabled: true
+        data:
+          kubernetes.yaml: |
+            mode: cluster
+            traefik: true 
+          settings.yaml: |
+            title: d90 Homepage
+        
+            background:
+              image: https://cdnb.artstation.com/p/assets/images/images/006/897/659/large/mikael-gustafsson-wallpaper-mikael-gustafsson.jpg
+              blur: sm # sm, md, xl... see https://tailwindcss.com/docs/backdrop-blur
+              # image: https://source.unsplash.com/random/?night,dark
+              saturate: 100 # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
+              brightness: 50 # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
+              opacity: 100 # 0-100
+        
+            # favicon: /images/icons/devil.png
+        
+            theme: dark
+            color: slate
+        
+            useEqualHeights: true
+            headerStyle: boxedWidgets
+        
+            layout:
+              Cluster Management: 
+                tab: Home
+                style: row
+                columns: 2
+              Network:
+                tab: Home
+                header: true
+                style: row
+                columns: 3
+              Streaming:
+                tab: Home
+                header: true
+                style: row
+                columns: 5
+              Media Stack:
+                tab: Home
+                header: true
+                style: row
+                columns: 5
+              Downloads:
+                tab: Home
+                header: true
+                style: row
+                columns: 2
+              Hypervisor:
+                tab: Home
+                header: true
+                style: row
+                columns: 2
+              Home Automation:
+                tab: Home
+                header: true
+                style: row
+                columns: 2
+              Pictures: 
+                tab: Home
+                header: true
+                style: row
+                columns: 2
+              Tech Resources: 
+                tab: Misc
+                header: true
+                style: row
+                columns: 4
+              Most Used: 
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5
+              DC Load Balancers:
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5        
+              Kemp Load Balancers:
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5    
+              Information:
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5        
+              Tools: 
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5     
+              Netbox: 
+                tab: Rutgers
+                header: true
+                style: row
+                columns: 5
+              Build Guides:
+                tab: PoE2
+                header: true
+                style: column
+                columns: 4
+              Resources:
+                tab: PoE2
+                header: true
+                style: column
+                columns: 4
+              Paul:
+                tab: Friends
+                header: true
+                style: column
+                columns: 4
+              Useful Links:
+                tab: Home
+                header: true
+                style: column
+                columns: 
+              Repositories:
+                tab: Home
+                header: true
+                style: column
+                columns: 2
+          custom.css: ""
+          custom.js: ""
+          bookmarks.yaml: |
+            - Medical:
+                - Summit Portal:
+                    - abbr: SHP
+                      href: https://2983-1.portal.athenahealth.com/
+          services.yaml: |
+            - Paul: 
+                - Jellyfin:
+                    href: https://jellyfin.epicfailonline.com
+                    icon: sh-jellyfin
+            - Useful Links: 
+                - Samsung SSD Warranty Claim:
+                    href: http://care.us.samsung.com/r/ZLpBpNHQ0
+                - Selfhost Icons:
+                    href: https://selfh.st/icons/
+                    icon: selfh-st
+            - Hypervisor:
+                - PVE:
+                    href: https://pve.d90.name:8006/
+                    icon: sh-proxmox
+                    siteMonitor: https://pve01.d90.name:8006/
+                - PVE2:
+                    href: https://pve02.d90.name:8006/
+                    icon: sh-proxmox
+                    siteMonitor: https://pve02.d90.name:8006/
+            - Network:
+                - OpnSense:
+                    href: https://home.nickdininno.com
+                    icon: sh-opnsense
+            - Streaming:
+                - Netflix: 
+                    href: https://netflix.com
+                    icon: sh-netflix
+                - Amazon Prime: 
+                    href: https://www.amazon.com/gp/video/storefront
+                    icon: sh-amazon-prime
+                - Disney +: 
+                    href: https://www.disneyplus.com/
+                    icon: sh-disney-plus
+            - Pictures: 
+                - Google Photos:
+                    href: https://photos.google.com/
+                    icon: sh-google-photos
+                - Amazon Photos: 
+                    href: https://www.amazon.com/photos
+                    icon: sh-amazon
+            - Most Used: 
+                - Netbox: 
+                    icon: sh-netbox
+                    href: https://netbox.ei.rutgers.edu/
+                - Rundeck:
+                    icon: sh-rundeck
+                    href: http://rundeck.ei.rutgers.edu/       
+                - SNow:
+                    icon: https://upload.wikimedia.org/wikipedia/commons/b/b6/Rutgers_Scarlet_Knights_logo.svg
+                    href: https://rutgers.service-now.com/  
+                - Dev Netbox: 
+                    icon: sh-netbox
+                    href: https://dev-netbox.ei.rutgers.edu/
+                - Argo-CD:
+                    icon: sh-argo-cd
+                    href: https://argo-netbox.apps.ocp.ei.rutgers.edu/                                                     
+            - DC Load Balancers:
+                - ASB1:
+                    icon: /images/icons/a10.svg
+                    href: https://a10-asb-1.ei.rutgers.edu/
+                - AWS1:
+                    icon: /images/icons/a10.svg
+                    href: https://a10-aws-1.ei.rutgers.edu/          
+                - KB1:
+                    icon: /images/icons/a10.svg
+                    href: https://a10-kb-1.ei.rutgers.edu/
+                - SG:
+                    icon: /images/icons/a10.svg
+                    href: https://a10-sg-1.ei.rutgers.edu/        
+                - ASB1:
+                    icon: /images/icons/f5.svg
+                    href: https://f5-asb-1.ei.rutgers.edu/
+                - AWS1:
+                    icon: /images/icons/f5.svg
+                    href: https://f5-aws-1.ei.rutgers.edu/          
+                - KB1:
+                    icon: /images/icons/f5.svg
+                    href: https://f5-kb-1.ei.rutgers.edu/
+                - SG:
+                    icon: /images/icons/f5.svg
+                    href: https://f5-sg-1.ei.rutgers.edu/
+            - Kemp Load Balancers:
+                - asb-1-a:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-1-a-asb-mgmt.ei.rutgers.edu
+                - asb-1-b:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-1-b-asb-mgmt.ei.rutgers.edu
+                - asb-2-a:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-2-a-asb-mgmt.ei.rutgers.edu
+                - asb-2-b:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-2-b-asb-mgmt.ei.rutgers.edu
+                - knb-1-a:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-1-a-knb-mgmt.ei.rutgers.edu
+                - knb-1-b:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-1-b-knb-mgmt.ei.rutgers.edu
+                - knb-2-a:
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-2-a-knb-mgmt.ei.rutgers.edu
+                - knb-2-b:       
+                    icon: /images/icons/kemp.png
+                    href: https://kempecm-2-b-knb-mgmt.ei.rutgers.edu
+            - Information: 
+                - Sharepoint: 
+                    icon: sh-microsoft-sharepoint
+                    href: https://rutgersconnect-my.sharepoint.com/
+                - EI-Docs: 
+                    icon: https://upload.wikimedia.org/wikipedia/commons/b/b6/Rutgers_Scarlet_Knights_logo.svg
+                    href: https://ei-docs.apps.ocp.ei.rutgers.edu/          
+                - Wiki: 
+                    icon: sh-wikipedia
+                    href: https://wiki.ei.rutgers.edu/index.php?title=Special:UserLogin
+            - Tools:   
+                - Vaultwarden: 
+                    icon: sh-vaultwarden
+                    href: https://vaultwarden.ei.rutgers.edu
+                - Vault:
+                    icon: sh-hashicorp-vault
+                    href: https://vault-api.ei.rutgers.edu/ 
+                - Dev Spaces:
+                    icon: /images/icons/devSpaces.png
+                    href: https://devspaces.apps.ocp.ei.rutgers.edu/dashboard
+                - OpenShift: 
+                    icon: /images/icons/openshift.png
+                    href: https://console.ei.rutgers.edu     
+                - Gitlab: 
+                    icon: sh-gitlab
+                    href: https://gitlab.rutgers.edu/
+                - CyberArk PAM: 
+                    icon: /images/icons/poo.svg
+                    href: https://rutgerspams.cyberark.cloud/
+                - Infoblox: 
+                    icon: /images/icons/infoblox.png
+                    href: https://hostmaster.td.rutgers.edu/ui/
+                - IT Tools: 
+                    icon: /images/icons/it-tools.png
+                    href: https://tools.apps.ocp.ei.rutgers.edu/
+                - WebNetTools:
+                    icon: /images/icons/wnt.png
+                    href: http://lg.apps.ocp.ei.rutgers.edu/
+                - Juniper Apstra:
+                    icon: /images/icons/apstra.png
+                    href: https://apstra.ei.rutgers.edu/#/blueprints
+            - Cluster Management: 
+                - Github d90/homelab editor:
+                    icon: /images/icons/github-mark-white.png
+                    href: https://github.dev/d90/homelab-k3s
+                - Github d90/homelab:
+                    icon: /images/icons/github-mark-white.png
+                    href: https://github.com/d90/homelab-k3s
+            - Tech Resources:
+                - Truecharts: 
+                    icon: /images/icons/trueforge.svg
+                    href: https://truecharts.org/truetech/truecharts/charts/description-list/
+                - Gemini:
+                    icon: sh-google-gemini
+                    href: https://gemini.google.com
+                - ChatGPT:
+                    icon: sh-chatgpt
+                    href: https://chatgpt.com/
+                - Techno Tim:
+                    icon: /images/icons/techno-tim.jpg
+                    href: https://technotim.live/
+                - LSIO Fleet:
+                    icon: sh-linuxserver-io
+                    href: https://fleet.linuxserver.io/
+                - Mend Renovate:
+                    icon: si-renovate
+                    href: https://developer.mend.io/github/d90/homelab-k3s
+                - Proxmox VE Helper-Scripts:
+                    icon: /images/icons/helper-scripts.png
+                    href: https://github.com/community-scripts/ProxmoxVE
+            - Build Guides: 
+                - Huntress:
+                    icon: /images/icons/huntress.png
+                    href: https://maxroll.gg/poe2/build-guides/bleed-rake-amazon-build-guide
+            - Resources: 
+                - Maxroll.gg:
+                    icon: /images/icons/maxroll.png
+                    href: https://maxroll.gg/poe2
+                - Trade Site:
+                    icon: /images/icons/PoE-trade.png
+                    href: https://www.pathofexile.com/trade2/search/poe2/Standard       
+                - mmoexp:
+                    icon: /images/icons/mmoexp.png
+                    href: https://www.mmoexp.com/Poe-2.html 
+            - Repositories:
+                - Netbox Custom Objects:
+                    icon: sh-netbox
+                    href: https://github.com/netboxlabs/netbox-custom-objects
+          widgets.yaml: |
+            - kubernetes:
+                cluster:
+                  show: true
+                  cpu: true
+                  memory: true
+                  showLabel: true
+                  label: "cluster"
+                nodes:
+                  show: true
+                  cpu: true
+                  memory: true
+                  showLabel: true
+            - resources:
+                backend: resources
+                expanded: true
+                cpu: true
+                memory: true
+            # - search:
+            #     provider: google
+            #     target: _blank
+          docker.yaml: ""
+    
+    forceConfigFromValues: true
+    
+    rbac:
+      main:
+        enabled: true
+        primary: true
+        clusterWide: true
+        rules:
+          - apiGroups:
+              - ""
+            resources:
+              - namespaces
+              - pods
+              - nodes
+            verbs:
+              - get
+              - list
+          - apiGroups:
+              - extensions
+              - networking.k8s.io
+            resources:
+              - ingresses
+            verbs:
+              - get
+              - list
+          - apiGroups:
+              - traefik.containo.us
+              - traefik.io
+            resources:
+              - ingressroutes
+            verbs:
+              - get
+              - list
+          - apiGroups:
+              - metrics.k8s.io
+            resources:
+              - nodes
+              - pods
+            verbs:
+              - get
+              - list
+          - apiGroups:
+              - apiextensions.k8s.io
+            resources:
+              - customresourcedefinitions/status
+            verbs:
+              - get
+      

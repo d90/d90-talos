@@ -1,0 +1,96 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":disableRateLimiting",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "pruneStaleBranches": true,
+  "timezone": "America/New_York",
+  "ignorePaths": [
+    "home/apps/default/postgres/**"
+  ],
+  "assignees": [
+    "d90"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "/linuxserver/"
+      ],
+      "labels": [
+        "lsio"
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "/.*arr$/"
+      ],
+      "addLabels": [
+        "media-stack"
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "/fluxcd/"
+      ],
+      "addLabels": [
+        "fluxcd"
+      ]
+    },
+    {
+      "groupName": "cert-manager (chart + CRDs)",
+      "matchManagers": [
+        "flux",
+        "custom.regex"
+      ],
+      "matchPackageNames": [
+        "/cert-manager/"
+      ]
+    },
+    {
+      "description": "Group FluxCD non-major updates",
+      "matchManagers": [
+        "flux"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "fluxcd non-major updates",
+      "groupSlug": "fluxcd-non-major",
+      "addLabels": [
+        "fluxcd"
+      ],
+      "automerge": true
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)kustomization\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "https://github\\.com/cert-manager/cert-manager/releases/download/v(?<currentValue>\\d+\\.\\d+\\.\\d+)/cert-manager\\.crds\\.yaml"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "cert-manager/cert-manager"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)helmrelease\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "chart:\\s*\\n\\s+spec:\\s*\\n\\s+chart:\\s+(?<depName>[\\w-]+)\\s*\\n\\s+version:\\s+\"(?<currentValue>[^\"]+)\"[^\\n]*\\n\\s+sourceRef:\\s*\\n\\s+kind:\\s+HelmRepository\\s*\\n\\s+name:\\s+tc-truecharts"
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://oci.trueforge.org",
+      "packageNameTemplate": "truecharts/{{depName}}"
+    }
+  ]
+}

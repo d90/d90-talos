@@ -1,0 +1,30 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: seerr
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://seerr.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: seerr
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: jellyseerr.png
+    gethomepage.dev/name: seerr
+    gethomepage.dev/widget.type: "jellyseerr"
+    gethomepage.dev/widget.url: "http://seerr:8989"
+    gethomepage.dev/widget.key: "MTc2NzEzNTAxOTI4OGZmZTlkZjM5LTdhMWEtNGQ5Zi05YzAwLTY3Njk2NzAyZGE4Yw=="
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+    # # gethomepage.dev/instance: "public" # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`seerr.d90.name`)
+    kind: Rule
+    services:
+    - name: seerr
+      kind: Service
+      port: 10241
+  tls:
+    secretName: tls.seerr

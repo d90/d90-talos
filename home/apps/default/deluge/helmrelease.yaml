@@ -1,0 +1,83 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: deluge
+  namespace: default
+spec:
+  interval: 5m
+
+  chart:
+    spec:
+      chart: deluge
+      version: "22.3.0" # Ensure this matches the available deluge chart version in your repo
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+    image:
+      repository: ghcr.io/linuxserver/deluge
+      pullPolicy: IfNotPresent
+      tag: version-2.2.0-r0@sha256:475db7c7290094ef21ec61113485405b9e4ff3df51ff18c1bcb0bc982099c754
+    securityContext:
+      container:
+        runAsNonRoot: false
+        readOnlyRootFilesystem: false
+        runAsUser: 0
+        runAsGroup: 0
+    service:
+      main:
+        ports:
+          main:
+            port: 8112
+            targetPort: 8112
+      rpc:
+        enabled: true
+        ports:
+          rpc:
+            enabled: true
+            port: 58846
+            targetPort: 58846
+      torrent:
+        enabled: true
+        ports:
+          tcp:
+            enabled: true
+            port: 6881
+            targetPort: 6881
+          udp:
+            enabled: true
+            port: "{{ .Values.service.torrent.ports.tcp.port }}"
+            targetPort: "{{ .Values.service.torrent.ports.tcp.targetPort }}"
+            protocol: udp
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              probes:
+                liveness:
+                  type: http
+                  path: /
+                readiness:
+                  type: http
+                  path: /
+                startup:
+                  type: http
+                  path: /
+    persistence:
+      media:
+        enabled: true
+        type: pvc
+        existingClaim: nfs-pvc-data
+        mountPath: /media
+
+      config:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        mountPath: /config

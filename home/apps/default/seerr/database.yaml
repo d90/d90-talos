@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: seerr-postgres
+  namespace: default
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:14
+  storage:
+    storageClass: nfs-client
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: seerr
+      owner: seerr
+      secret:
+        name: seerr-postgres-secret
+      postInitSQL:
+        - CREATE DATABASE "seerr-log" OWNER seerr;
+  superuserSecret:
+    name: seerr-postgres-secret
+  monitoring:
+    enablePodMonitor: true

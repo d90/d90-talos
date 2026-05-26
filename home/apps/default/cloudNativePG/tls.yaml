@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cnpg-webhook-cert
+  namespace: flux-system
+spec:
+  secretName: cnpg-webhook-cert
+  commonName: cnpg-webhook-service.flux-system.svc
+  dnsNames:
+    - cnpg-webhook-service.flux-system.svc
+    - cnpg-webhook-service.flux-system.svc.cluster.local
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always

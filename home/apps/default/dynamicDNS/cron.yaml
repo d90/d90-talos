@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: route53-dyndns-cron
+  namespace: default
+spec:
+  schedule: "*/20 * * * *"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 100
+      template:
+        spec:
+          containers:
+          - image: docker.io/bshaw/route53-dyndns@sha256:ec96413650fe88fcf149269601ff71b1a4c60c3b1c1723a79d21b0dfbca82238
+            name: route53-dyndns
+            imagePullPolicy: Always
+            envFrom:
+            - prefix: ''
+              secretRef:
+                name: route53-dyndns-secret
+            args:
+            - --record
+            - home.nickdininno.com
+            - --verbose
+          restartPolicy: OnFailure

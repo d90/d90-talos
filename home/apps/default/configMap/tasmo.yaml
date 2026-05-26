@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tasmo
+  namespace: default
+data:
+  TASMO_BASEURL: tasmo.d90.name
+

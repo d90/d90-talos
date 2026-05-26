@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: containerd-pruner
+  namespace: kube-system
+spec:
+  schedule: "0 0 * * 0" # Runs every Sunday at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          hostNetwork: true
+          containers:
+          - name: pruner
+            image: busybox
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Use crictl to prune unused images
+              /usr/local/bin/crictl rmi --prune
+            volumeMounts:
+            - name: crictl-config
+              mountPath: /etc/crictl.yaml
+              readOnly: true
+            - name: containerd-sock
+              mountPath: /run/k3s/containerd/containerd.sock
+          volumes:
+          - name: crictl-config
+            hostPath:
+              path: /etc/crictl.yaml
+          - name: containerd-sock
+            hostPath:
+              path: /run/k3s/containerd/containerd.sock
+          restartPolicy: OnFailure
+          # Ensure it runs on the node that gave you trouble
+          nodeSelector:
+            kubernetes.io/hostname: k3s8

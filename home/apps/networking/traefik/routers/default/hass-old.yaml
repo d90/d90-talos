@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hass-old
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`hass-old.d90.name`)
+    kind: Rule
+    services:
+    - name: hass
+      kind: Service
+      port: 8123
+  tls:
+    secretName: tls.hass-old

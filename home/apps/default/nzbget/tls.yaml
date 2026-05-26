@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.nzbget
+  namespace: default
+spec:
+  dnsNames:
+    - nzbget.d90.name
+  secretName: tls.nzbget
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer
+

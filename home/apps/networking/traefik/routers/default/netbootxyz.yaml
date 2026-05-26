@@ -1,0 +1,28 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: &app netbootxyz
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://netbootxyz.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: netbootxyz
+    gethomepage.dev/group: Tools
+    gethomepage.dev/icon: netbootxyz.png
+    gethomepage.dev/name: netbootxyz
+    gethomepage.dev/widget.type: "netbootxyz"
+    gethomepage.dev/widget.url: "http://netbootxyz:10612"
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10 # optional
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`netbootxyz.d90.name`)
+    kind: Rule
+    services:
+    - name: *app
+      kind: Service
+      port: 10612
+  tls:
+    secretName: tls.netbootxyz

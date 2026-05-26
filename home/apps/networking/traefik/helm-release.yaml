@@ -1,0 +1,63 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: networking
+spec:
+  chart:
+    spec:
+      chart: traefik
+      version: "39.0.1"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  interval: 10m0s
+
+  values:
+    deployment:
+      kind: Deployment
+      enabled: true
+      replicas: 3
+
+    # installCRDs: false
+
+    additionalArguments:
+      - "--global.sendanonymoususage=false"
+      - "--global.checknewversion=false"
+      - "--serversTransport.insecureSkipVerify=true"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+      - "--providers.kubernetescrd.namespaces=default,monitoring,tdarr,flux-system,databasus"
+
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+      postgres:
+        port: 5432
+        protocol: TCP
+
+    ingressRoute:
+      dashboard:
+        enabled: false
+
+
+    # providers:
+    #   kubernetesCRD:
+    #     enabled: false
+
+    # service:
+    #   enabled: true
+    #   type: LoadBalancer
+    #   annotations: {}
+    #   labels: {}
+    #   spec:
+    #     loadBalancerIP: 10.10.100.80 # this should be an IP in the MetalLB range
+    #   loadBalancerSourceRanges: []
+    #   externalIPs: []

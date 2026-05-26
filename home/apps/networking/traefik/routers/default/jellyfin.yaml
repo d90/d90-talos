@@ -1,0 +1,51 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+    name: jellyfin
+    namespace: default
+    annotations:
+        gethomepage.dev/href: https://jellyfin.d90.name
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: jellyfin
+        gethomepage.dev/group: Streaming
+        gethomepage.dev/icon: jellyfin.png
+        gethomepage.dev/name: jellyfin
+        gethomepage.dev/widget.type: jellyfin
+        gethomepage.dev/widget.url: http://jellyfin:8096
+        gethomepage.dev/widget.key: ENC[AES256_GCM,data:Y4O+Y+zmzPqNc14wfYiHRIfOL6R196C9AIBxhCuY8+s=,iv:+2ZIdQ4VJqGj3zpjy/HqAExwHkCTsIW2h4dDWfhMFgU=,tag:+63obR4YjGCDLsKFF31VJQ==,type:str]
+        # gethomepage.dev/pod-selector: ""
+        # optional
+        gethomepage.dev/weight: 10
+        # # gethomepage.dev/instance: "public" # optional
+spec:
+    entryPoints:
+        - websecure
+    routes:
+        - match: Host(`jellyfin.d90.name`)
+          kind: Rule
+          services:
+            - name: jellyfin
+              kind: Service
+              port: 8096
+    tls:
+        secretName: tls.jellyfin
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBERmVDR0FhaEZXYXUrV2da
+            RnFEdXZWeUZqMXlkTW9Qa3lKU3FNTlhHRDBzCkdPY1NEeVdOU3pXNlRqbTF0SFpR
+            aGlMRmpwbnUxb2F1SElYOFpsWWlFeTQKLS0tIHBrNVJBczl2NjRQT1VLd215anBD
+            dmxBbzdxNkpHTW42K1Y5SFF0MTdhc1EKNi+XBBeU26mwsMyUfh0MNzx8+RvG/3sl
+            VZDMOvZQR+s/psAmGZ4iV2G2CpSGDm5UAVsTN9rHEfGt2XbrI17WFA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-07-11T20:55:46Z"
+    mac: ENC[AES256_GCM,data:9yyHAZsutizQkspzO8BkHQZKhJbBVK98VRjyLUF8ZGlhNYl01oFcJetK6fF3pQVcznNmnJ+4bIXOJ1StjmlqfvbrfdC6QLP8wAlN5THHrc6L09jtUvYaHtBxVgTYhvLSVH4k8ha9rElDFiomIU1UOayOaBbx9OJtt/21ZPyRRUk=,iv:+anixOh93GoVAhV/dA+o2RN6vTrZvkK5z5jzvc/g+kc=,tag:avw5xrh2jV/2uXfFtEA5Mw==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.key)$
+    version: 3.9.0

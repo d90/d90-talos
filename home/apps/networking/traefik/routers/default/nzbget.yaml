@@ -1,0 +1,52 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+    name: nzbget
+    namespace: default
+    annotations:
+        gethomepage.dev/href: https://nzbget.d90.name
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: nzbget
+        gethomepage.dev/group: Downloads
+        gethomepage.dev/icon: nzbget.png
+        gethomepage.dev/name: nzbget
+        gethomepage.dev/widget.type: nzbget
+        gethomepage.dev/widget.url: http://nzbget:6789
+        gethomepage.dev/widget.username: ENC[AES256_GCM,data:27TreoVI,iv:uUulkKj1kltmPdX9Aq0CPwt7iPdr8WESbdk//RBcwD8=,tag:YmzNlKCLEUjPCD4mizG+Yg==,type:str]
+        gethomepage.dev/widget.password: ENC[AES256_GCM,data:gXuZQSbBr+OI6n6ed2w9VQ==,iv:0tfklAkB270fpB+yJ+qF/OnkfDJwLXOH+UpJ6rLG7t8=,tag:acwhHIR6NltJAdho7VCa8Q==,type:str]
+        gethomepage.dev/pod-selector: ""
+        # optional
+        gethomepage.dev/weight: 10
+        # # gethomepage.dev/instance: "public" # optional
+spec:
+    entryPoints:
+        - websecure
+    routes:
+        - match: Host(`nzbget.d90.name`)
+          kind: Rule
+          services:
+            - name: nzbget
+              kind: Service
+              port: 6789
+    tls:
+        secretName: tls.nzbget
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUdDBHbnU5cDhnNzVFSDcw
+            RzRlYkZqSmhEQ25aQ2tycTkvWGRQU2FpR21FCm1Selg3N2k2MVBRdkxrVngwUHR1
+            Rm84NVkySkw4T1RYdEZ2cW5XK09BZ28KLS0tIGRhVCtLTW02OFVnakgvY09qUjNk
+            Q1ZEMjQ4SkhaQXNjUGMvQ1M3RHpYREkKxLWzm55XOmLmT7afSFcci3d5N0ipEC4v
+            ekpjIGaLCf6DDOio4TfrTmRqSLF+8NnNSEgCzp6+uM8Xj8i97Hvcvw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-10-30T13:30:23Z"
+    mac: ENC[AES256_GCM,data:OOp6NAOUAo5sq3zgpL9zdmNnOmScRaggqlOBiWp4+GTwlnS+ud7RTydul2T4ObyqwhAjqmM2K1Ce51i+1hcxM1kWjXHV7gRuHxYTp9hqf+5hdxJRzdfGTAxxToeOCjzrey6CXN2R1A4y9JL1k8mA+Ed0LmGsVFwQ7xcAoWBTEUg=,iv:d6HRizCXAqZRlRotMvnOqWc6HhHjC7ceQqL087LSK1U=,tag:/Ylg+ztezQbYwiUqRO1i+w==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.username|gethomepage.dev/widget.password)$
+    version: 3.9.0

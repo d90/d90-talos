@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hubitat
+  namespace: default
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  clusterIP: None
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: hubitat
+  namespace: default
+subsets:
+  - addresses:
+      - ip: 	10.10.30.200
+    ports:
+      - port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hubitat
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://hubitat.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Home Automation
+    gethomepage.dev/icon: hubitat
+    gethomepage.dev/name: hubitat
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hubitat.d90.name`)
+      kind: Rule
+      services:
+        - name: hubitat
+          port: 80
+  tls:
+    secretName: tls.hubitat
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.hubitat
+  namespace: default
+spec:
+  dnsNames:
+    - hubitat.d90.name
+  secretName: tls.hubitat
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer

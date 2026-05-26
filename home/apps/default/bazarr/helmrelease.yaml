@@ -1,0 +1,146 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bazarr
+  namespace: default
+spec:
+  interval: 5m
+
+  chart:
+    spec:
+      chart: bazarr
+      version: "24.3.0" # Ensure this matches the available bazarr chart version in your repo
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+
+    # ───────────────────────────────────────────────
+    # Disable metrics to avoid ServiceMonitor CRDs
+    # ───────────────────────────────────────────────
+    metrics:
+      main:
+        enabled: false
+        serviceMonitor:
+          enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable built-in ingress
+    # ───────────────────────────────────────────────
+    ingress:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Service definition
+    # ───────────────────────────────────────────────
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 6767      # Changed for bazarr
+            targetPort: 6767 # Changed for bazarr
+
+    # ───────────────────────────────────────────────
+    # Persistence (media + config)
+    # ───────────────────────────────────────────────
+    persistence:
+
+      config:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 10Gi
+        existingClaim: ""
+        mountPath: /config
+
+    # ───────────────────────────────────────────────
+    # Workload + PRODUCTION-GRADE PROBES
+    # ───────────────────────────────────────────────
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+        podSpec:
+          securityContext:
+            container:
+              readOnlyRootFilesystem: false
+
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+              env:
+                POSTGRES_PORT: "5432"
+                POSTGRES_USERNAME: "bazarr"
+                POSTGRES_DATABASE: "bazarr"
+                POSTGRES_ENABLED: "true"
+                POSTGRES_HOST: "bazarr-postgres-rw"
+              # Correct container port
+
+              ports:
+                - name: main
+                  containerPort: 6767 # Changed for bazarr
+
+              # ───────────────────────────────────────
+              # STABLE PROBES FOR NFS + LARGE LIBRARIES
+              # ───────────────────────────────────────
+
+              probes:
+                # bazarr becomes ready long before it is fully scanned
+                readiness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 12   # ~2 minutes
+                  successThreshold: 1
+
+                # Liveness probe must be gentle — bazarr can stall briefly
+                liveness:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  initialDelaySeconds: 30
+                  periodSeconds: 20
+                  timeoutSeconds: 2
+                  failureThreshold: 10   # ~3 minutes
+                  successThreshold: 1
+
+                # Startup probe prevents container kills during long boot
+                startup:
+                  enabled: true
+                  type: http
+                  path: /
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 90   # 15 minutes startup window
+  postRenderers:
+      - kustomize:
+          patches:
+            - target:
+                kind: Deployment
+                name: bazarr
+              patch: |
+                - op: add
+                  path: /spec/template/spec/containers/0/env/-
+                  value:
+                    name: POSTGRES_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: bazarr-postgres-secret
+                        key: password                  

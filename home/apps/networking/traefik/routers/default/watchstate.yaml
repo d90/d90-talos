@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: watchstate
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://watchstate.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: watchstate
+    gethomepage.dev/group: Media Stack
+    gethomepage.dev/icon: sh-watchstate
+    gethomepage.dev/name: watchstate
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`watchstate.d90.name`)
+    kind: Rule
+    services:
+    - name: watchstate
+      kind: Service
+      port: 8080
+  tls:
+    secretName: tls.watchstate
+
