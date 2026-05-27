@@ -9,7 +9,6 @@ resources:
   - lidarr.yaml
   - netbootxyz.yaml
   - nzbget.yaml
-  - ohif.yaml
   # - postgres.yaml
   - profilarr.yaml
   - prowlarr.yaml
