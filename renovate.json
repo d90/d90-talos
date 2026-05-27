@@ -8,9 +8,7 @@
   ],
   "pruneStaleBranches": true,
   "timezone": "America/New_York",
-  "ignorePaths": [
-    "home/apps/default/postgres/**"
-  ],
+  "ignorePaths": [],
   "assignees": [
     "d90"
   ],
