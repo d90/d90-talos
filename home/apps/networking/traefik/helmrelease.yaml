@@ -11,7 +11,7 @@ spec:
       version: "39.0.1"
       sourceRef:
         kind: HelmRepository
-        name: traefik
+        name: traefikv3
         namespace: flux-system
   interval: 10m0s
 
@@ -29,7 +29,7 @@ spec:
       - "--serversTransport.insecureSkipVerify=true"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=metrics"
-      - "--providers.kubernetescrd.namespaces=default,monitoring,tdarr,flux-system,databasus"
+      - "--providers.kubernetescrd.namespaces=default,monitoring,networking,tdarr,flux-system,databasus"
 
     ports:
       web:
