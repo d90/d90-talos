@@ -17,7 +17,7 @@ This repo (`d90-talos`) is a new Talos-based homelab cluster replacing the old k
 | homelab-k3s (old) | `10.10.100.80 – 10.10.100.90` |
 | d90-talos (new) | `10.10.100.101 – 10.10.100.109` |
 
-Pools are intentionally non-overlapping to avoid L2 ARP conflicts while both clusters are live. `10.10.100.100` is reserved for kube-vip on the Talos cluster.
+Pools are intentionally non-overlapping to avoid L2 ARP conflicts while both clusters are live. `10.10.100.100` is the kube-vip VIP on the old k3s cluster, so the Talos MetalLB pool starts at `.101`. Note: Talos does not use kube-vip — its control plane VIP is handled natively in the Talos machine config.
 
 ## Bootstrap Flux (must do first)
 
