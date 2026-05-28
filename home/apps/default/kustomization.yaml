@@ -4,22 +4,22 @@ resources:
 - bazarr
 - configmaps
 - cloudnative-pg
-- deluge
-- dynamic-dns
-- homepage-dashboard
-- homeassistant
+# - deluge
+# - dynamic-dns
+# - homepage-dashboard
+# - homeassistant
 # - jellyfin
-- lidarr
-- mosquitto
-- netbootxyz
-- nzbget
-- profilarr
-- prowlarr
-- radarr
-- scrypted
-- seerr
-- sonarr
-- tasmo
+# - lidarr
+# - mosquitto
+# - netbootxyz
+# - nzbget
+# - profilarr
+# - prowlarr
+# - radarr
+# - scrypted
+# - seerr
+# - sonarr
+# - tasmo
 # - una
 # - watchstate
-- webnettools
+# - webnettools

@@ -2,25 +2,25 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - bazarr.yaml
-  - deluge.yaml
-  - hass.yaml
-  - homepage.yaml
+  # - deluge.yaml
+  # - hass.yaml
+  # - homepage.yaml
   # - jellyfin.yaml
-  - lidarr.yaml
-  - netbootxyz.yaml
-  - nzbget.yaml
+  # - lidarr.yaml
+  # - netbootxyz.yaml
+  # - nzbget.yaml
   # - postgres.yaml
-  - profilarr.yaml
-  - prowlarr.yaml
-  - radarr.yaml
-  - scrypted.yaml
-  - seerr.yaml
-  - sonarr.yaml
-  - tasmo.yaml
-  - watchstate.yaml
-  - webnettools.yaml
-  - ext-qnap.yaml
-  - ext-agh.yaml
-  - ext-emby.yaml
-  - ext-hubitat.yaml
-  - ext-unifi-os.yaml
+  # - profilarr.yaml
+  # - prowlarr.yaml
+  # - radarr.yaml
+  # - scrypted.yaml
+  # - seerr.yaml
+  # - sonarr.yaml
+  # - tasmo.yaml
+  # - watchstate.yaml
+  # - webnettools.yaml
+  # - ext-qnap.yaml
+  # - ext-agh.yaml
+  # - ext-emby.yaml
+  # - ext-hubitat.yaml
+  # - ext-unifi-os.yaml
