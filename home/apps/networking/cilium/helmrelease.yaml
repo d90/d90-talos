@@ -5,6 +5,10 @@ metadata:
   namespace: kube-system
 spec:
   interval: 10m
+  install:
+    timeout: 15m
+  upgrade:
+    timeout: 15m
   chart:
     spec:
       chart: cilium
