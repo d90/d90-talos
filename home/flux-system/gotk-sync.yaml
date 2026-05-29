@@ -13,14 +13,95 @@ spec:
     name: flux-system
   url: ssh://git@github.com/d90/d90-talos.git
 ---
+# Layer 1: CRDs — applied first, no dependencies
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: flux-system
+  name: crds
   namespace: flux-system
 spec:
-  interval: 10m0s
-  path: ./home
+  interval: 10m
+  path: ./home/crds
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+# Layer 2a: Core controllers (cert-manager, storage, reloader, etc.)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: core
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: crds
+  path: ./home/core
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+# Layer 2b: Helm chart sources (HelmRepositories)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: charts
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: crds
+  path: ./home/charts
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+# Layer 3: Networking — Traefik + MetalLB HelmReleases
+# wait: true ensures Traefik CRDs exist before the apps layer applies IngressRoutes
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: networking
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: core
+    - name: charts
+  path: ./home/apps/networking
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  wait: true
+  timeout: 5m
+---
+# Layer 4: Apps — workloads + IngressRoutes (safe because networking is ready)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: networking
+  path: ./home/apps
   prune: true
   sourceRef:
     kind: GitRepository
