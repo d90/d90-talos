@@ -4,6 +4,6 @@ resources:
   - helmrelease.yaml
   - tls.yaml
   # - middlewares
-  - routers
   - service.yaml
   - serverstransport
+  # routers are applied by the apps Flux Kustomization after Traefik CRDs are ready
