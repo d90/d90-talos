@@ -67,7 +67,27 @@ spec:
     kind: GitRepository
     name: flux-system
 ---
-# Layer 3: Networking — Traefik + MetalLB HelmReleases
+# Layer 3: Cilium CNI — must be fully running before networking or apps can start
+# wait: true ensures Cilium CRDs (L2 pool/policy) exist before networking layer applies them
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cilium
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: core
+    - name: charts
+  path: ./home/apps/networking/cilium
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  timeout: 5m
+---
+# Layer 4: Networking — Traefik + Cilium L2 pool/policy
 # wait: true ensures Traefik CRDs exist before the apps layer applies IngressRoutes
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -77,8 +97,7 @@ metadata:
 spec:
   interval: 10m
   dependsOn:
-    - name: core
-    - name: charts
+    - name: cilium
   path: ./home/apps/networking
   prune: true
   sourceRef:
@@ -91,7 +110,7 @@ spec:
   wait: true
   timeout: 5m
 ---
-# Layer 4: Apps — workloads + IngressRoutes (safe because networking is ready)
+# Layer 5: Apps — workloads + IngressRoutes (safe because networking is ready)
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
