@@ -19,7 +19,6 @@ resources:
 # - scrypted
 - seerr
 - sonarr
-# - tasmo
-# - una
+- tasmo
 # - watchstate
 - webnettools
