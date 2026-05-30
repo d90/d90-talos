@@ -6,7 +6,7 @@ resources:
 - cloudnative-pg
 # - deluge
 # - dynamic-dns
-# - homepage-dashboard
+- homepage-dashboard
 # - homeassistant
 # - jellyfin
 # - lidarr
