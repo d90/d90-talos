@@ -67,7 +67,7 @@ spec:
     # ───────────────────────────────────────────────
     image:
       repository: docker.io/santiagosayshey/profilarr
-      tag: "v1.1.4@sha256:8a514f8429cd33885166facc9eb6504fa9ded056c737609e5e8ef32ae0afb350" 
+      tag: "v1.1.4@sha256:96cc212c1ef9970d86b3ec95627795ddc447f6a99c3597d2eeba8193f1bfbd29"
       pullPolicy: IfNotPresent
 
     # ───────────────────────────────────────────────
