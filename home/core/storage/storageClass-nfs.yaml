@@ -10,7 +10,7 @@ mountOptions:
   - tcp
 parameters:
   pathPattern: "${.PVC.namespace}/${.PVC.name}"
-  onDelete: delete
-reclaimPolicy: Delete
+  onDelete: retain
+reclaimPolicy: Retain
 volumeBindingMode: Immediate
 allowVolumeExpansion: false
