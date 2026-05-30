@@ -12,7 +12,7 @@ resources:
   # - postgres.yaml
   # - profilarr.yaml
   # - prowlarr.yaml
-  # - radarr.yaml
+  - radarr.yaml
   # - scrypted.yaml
   # - seerr.yaml
   # - sonarr.yaml
