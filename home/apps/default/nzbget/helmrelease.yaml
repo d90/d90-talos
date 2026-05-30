@@ -97,35 +97,29 @@ spec:
               # ───────────────────────────────────────
 
               probes:
-                # nzbget becomes ready long before it is fully scanned
+                # NZBGet returns 401 on all HTTP paths — use TCP to check port is open
                 readiness:
                   enabled: true
-                  type: http
-                  path: /
+                  type: tcp
                   port: main
                   periodSeconds: 10
                   timeoutSeconds: 2
-                  failureThreshold: 12   # ~2 minutes
+                  failureThreshold: 12
                   successThreshold: 1
 
-                # Liveness probe must be gentle — nzbget can stall briefly
                 liveness:
                   enabled: true
-                  type: http
-                  path: /
+                  type: tcp
                   port: main
                   initialDelaySeconds: 30
                   periodSeconds: 20
                   timeoutSeconds: 2
-                  failureThreshold: 10   # ~3 minutes
-                  successThreshold: 1
+                  failureThreshold: 10
 
-                # Startup probe prevents container kills during long boot
                 startup:
                   enabled: true
-                  type: http
-                  path: /
+                  type: tcp
                   port: main
                   periodSeconds: 10
                   timeoutSeconds: 2
-                  failureThreshold: 90   # 15 minutes startup window
+                  failureThreshold: 90
