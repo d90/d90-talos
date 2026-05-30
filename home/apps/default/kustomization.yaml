@@ -10,8 +10,8 @@ resources:
 # - homeassistant
 # - jellyfin
 # - lidarr
-# - mosquitto
-# - netbootxyz
+- mosquitto
+- netbootxyz
 - nzbget
 - profilarr
 - prowlarr
@@ -22,4 +22,4 @@ resources:
 # - tasmo
 # - una
 # - watchstate
-# - webnettools
+- webnettools
