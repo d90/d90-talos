@@ -5,18 +5,18 @@ resources:
 - configmaps
 - cloudnative-pg
 - deluge
-# - dynamic-dns
+- dynamic-dns
 - homepage-dashboard
 # - homeassistant
 # - jellyfin
-# - lidarr
+- lidarr
 - mosquitto
 - netbootxyz
 - nzbget
 - profilarr
 - prowlarr
 - radarr
-# - scrypted
+- scrypted
 - seerr
 - sonarr
 - tasmo
