@@ -17,7 +17,7 @@ resources:
 - prowlarr
 - radarr
 # - scrypted
-# - seerr
+- seerr
 - sonarr
 # - tasmo
 # - una
