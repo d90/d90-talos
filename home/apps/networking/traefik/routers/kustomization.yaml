@@ -4,6 +4,6 @@ resources:
   - default
   # - flux
   # - monitoring
-  # - databasus
+  - databasus
   - networking
   # - tdarr
