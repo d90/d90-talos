@@ -517,10 +517,10 @@ spec:
             - Cluster Management: 
                 - Github d90/homelab editor:
                     icon: /images/icons/github-mark-white.png
-                    href: https://github.dev/d90/homelab-k3s
+                    href: https://github.dev/d90/d90-talos
                 - Github d90/homelab:
                     icon: /images/icons/github-mark-white.png
-                    href: https://github.com/d90/homelab-k3s
+                    href: https://github.com/d90/d90-talos
             - Tech Resources:
                 - Truecharts: 
                     icon: /images/icons/trueforge.svg
@@ -539,7 +539,7 @@ spec:
                     href: https://fleet.linuxserver.io/
                 - Mend Renovate:
                     icon: si-renovate
-                    href: https://developer.mend.io/github/d90/homelab-k3s
+                    href: https://developer.mend.io/github/d90/d90-talos
                 - Proxmox VE Helper-Scripts:
                     icon: /images/icons/helper-scripts.png
                     href: https://github.com/community-scripts/ProxmoxVE
