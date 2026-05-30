@@ -11,11 +11,11 @@ resources:
   # - nzbget.yaml
   # - postgres.yaml
   # - profilarr.yaml
-  # - prowlarr.yaml
+  - prowlarr.yaml
   - radarr.yaml
   # - scrypted.yaml
   # - seerr.yaml
-  # - sonarr.yaml
+  - sonarr.yaml
   # - tasmo.yaml
   # - watchstate.yaml
   # - webnettools.yaml

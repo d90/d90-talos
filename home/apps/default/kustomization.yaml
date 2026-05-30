@@ -14,11 +14,11 @@ resources:
 # - netbootxyz
 # - nzbget
 # - profilarr
-# - prowlarr
+- prowlarr
 - radarr
 # - scrypted
 # - seerr
-# - sonarr
+- sonarr
 # - tasmo
 # - una
 # - watchstate
