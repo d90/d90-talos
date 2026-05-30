@@ -67,8 +67,8 @@ spec:
     # ───────────────────────────────────────────────
     image:
       repository: docker.io/santiagosayshey/profilarr
-      tag: "v1.1.4@sha256:96cc212c1ef9970d86b3ec95627795ddc447f6a99c3597d2eeba8193f1bfbd29"
-      pullPolicy: IfNotPresent
+      tag: "v1.1.4"
+      pullPolicy: Always
 
     # ───────────────────────────────────────────────
     # Workload + PRODUCTION-GRADE PROBES
