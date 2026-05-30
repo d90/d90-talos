@@ -4,7 +4,7 @@ resources:
 - bazarr
 - configmaps
 - cloudnative-pg
-# - deluge
+- deluge
 # - dynamic-dns
 - homepage-dashboard
 # - homeassistant
