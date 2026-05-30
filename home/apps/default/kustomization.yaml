@@ -15,7 +15,7 @@ resources:
 # - nzbget
 # - profilarr
 # - prowlarr
-# - radarr
+- radarr
 # - scrypted
 # - seerr
 # - sonarr
