@@ -4,3 +4,4 @@ resources:
   - databasus
   - default
   - networking/traefik/routers
+  - tdarr
