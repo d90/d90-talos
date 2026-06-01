@@ -9,5 +9,5 @@ resources:
 - networking.yaml
 - reloader.yaml
 - storage.yaml
-- talos-dns-opnsense.yaml
+- traefik-unbound.yaml
 - tdarr.yaml
