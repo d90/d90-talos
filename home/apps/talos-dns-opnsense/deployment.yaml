@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: talos-dns-opnsense
+  namespace: talos-dns-opnsense
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: talos-dns-opnsense
+  template:
+    metadata:
+      labels:
+        app: talos-dns-opnsense
+    spec:
+      serviceAccountName: talos-dns-opnsense
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+      containers:
+        - name: manager
+          image: ghcr.io/d90/talos-dns-opnsense:latest
+          env:
+            - name: OPNSENSE_URL
+              value: "https://10.10.10.1"
+            - name: TARGET_IP
+              value: "10.10.100.101"
+            - name: TLS_SKIP_VERIFY
+              value: "false"
+            - name: OPNSENSE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: opnsense-creds
+                  key: api-key
+            - name: OPNSENSE_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: opnsense-creds
+                  key: api-secret
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
