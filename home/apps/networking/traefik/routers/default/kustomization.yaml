@@ -15,7 +15,7 @@ resources:
   # - scrypted.yaml
   - seerr.yaml
   - sonarr.yaml
-  # - tasmo.yaml
+  - tasmo.yaml
   # - watchstate.yaml
   - webnettools.yaml
   - ext-qnap.yaml
