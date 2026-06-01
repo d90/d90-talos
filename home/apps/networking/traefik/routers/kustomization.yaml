@@ -6,4 +6,4 @@ resources:
   # - monitoring
   - databasus
   - networking
-  # - tdarr
+  - tdarr
