@@ -9,4 +9,5 @@ resources:
 - networking.yaml
 - reloader.yaml
 - storage.yaml
+- talos-dns-opnsense.yaml
 - tdarr.yaml
