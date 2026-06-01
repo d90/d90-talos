@@ -13,4 +13,4 @@ spec:
     - name: server
       port: 8266
       targetPort: 8266
-  type: ClusterIP
+  type: LoadBalancer
