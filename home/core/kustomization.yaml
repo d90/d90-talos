@@ -3,8 +3,6 @@ kind: Kustomization
 resources:
   - namespaces
   - cert-manager
-  # - housekeeping
-  # - kustomization
   - reloader
   - storage
   # - vgpu
