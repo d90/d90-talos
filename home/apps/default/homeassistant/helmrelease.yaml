@@ -37,7 +37,7 @@ spec:
               command: /config/init/init.sh
     
     homeassistant:
-      trusted_proxies: [10.42.0.0/16, 10.43.0.0/16,10.10.100.0/25, 10.10.10.0/24, 10.10.20.0/24]
+      trusted_proxies: [10.244.0.0/16, 10.10.100.0/25, 10.10.10.0/24, 10.10.20.0/24]
     # Enable a prometheus-operator servicemonitor
     prometheus:
       serviceMonitor:

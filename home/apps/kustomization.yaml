@@ -4,5 +4,5 @@ resources:
   - databasus
   - default
   - networking/traefik/routers
-  - talos-dns-opnsense
+  - traefik-unbound
   - tdarr
