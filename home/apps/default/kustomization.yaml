@@ -9,7 +9,7 @@ resources:
 - homepage-dashboard
 - homeassistant
 # - jellyfin
-- lidarr
+# - lidarr
 - mosquitto
 - netbootxyz
 - nzbget
