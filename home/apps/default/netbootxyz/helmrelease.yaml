@@ -51,9 +51,8 @@ spec:
       assets:
         enabled: true
         type: LoadBalancer
-        loadBalancerIP: 10.10.100.82
         annotations:
-          metallb.universe.tf/allow-shared-ip: "netbootxyz-10.10.100.82"
+          io.cilium/lb-ipam-ips: "10.10.100.109"
         ports:
           assets:
             enabled: true
@@ -63,9 +62,8 @@ spec:
       tftp:
         enabled: true
         type: LoadBalancer
-        loadBalancerIP: 10.10.100.82
         annotations:
-          metallb.universe.tf/allow-shared-ip: "netbootxyz-10.10.100.82"
+          io.cilium/lb-ipam-ips: "10.10.100.108"
         ports:
           tftp:
             enabled: true
