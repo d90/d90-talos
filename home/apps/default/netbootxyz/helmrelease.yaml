@@ -124,6 +124,7 @@ spec:
               env:
                 MENU_VERSION: ""
                 TFTPD_OPTS: "--tftp-single-port"
+                LIVE_ENDPOINT: "http://10.10.100.109"
               ports:
                 - name: main
                   containerPort: 3000
