@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: bazarr
-      version: "24.3.0" # Ensure this matches the available bazarr chart version in your repo
+      version: "24.4.0" # Ensure this matches the available bazarr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
