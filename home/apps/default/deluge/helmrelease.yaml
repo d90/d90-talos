@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: deluge
-      version: "22.3.0" # Ensure this matches the available deluge chart version in your repo
+      version: "22.4.0" # Ensure this matches the available deluge chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
