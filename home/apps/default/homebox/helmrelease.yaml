@@ -6,6 +6,19 @@ metadata:
 spec:
   interval: 5m
 
+  # Inject password and API key pepper as plain values from the SOPS-decrypted
+  # secret — TrueCharts validates that secretKeyRef targets are chart-managed,
+  # so external secret refs must come in via valuesFrom instead.
+  valuesFrom:
+    - kind: Secret
+      name: homebox-postgres-secret
+      valuesKey: password
+      targetPath: workload.main.podSpec.containers.main.env.HBOX_DATABASE_PASSWORD
+    - kind: Secret
+      name: homebox-postgres-secret
+      valuesKey: api_key_pepper
+      targetPath: workload.main.podSpec.containers.main.env.HBOX_AUTH_API_KEY_PEPPER
+
   chart:
     spec:
       chart: homebox
@@ -100,15 +113,8 @@ spec:
                 HBOX_DATABASE_USERNAME: "homebox"
                 HBOX_DATABASE_DATABASE: "homebox"
                 HBOX_DATABASE_SSL_MODE: "disable"
-                HBOX_DATABASE_PASSWORD:
-                  secretKeyRef:
-                    name: homebox-postgres-secret
-                    key: password
-                HBOX_AUTH_API_KEY_PEPPER:
-                  secretKeyRef:
-                    name: homebox-postgres-secret
-                    key: api_key_pepper
                 HBOX_OPTIONS_TRUST_PROXY: "false"
+                # PASSWORD and API_KEY_PEPPER are injected via valuesFrom below
 
               probes:
                 readiness:
