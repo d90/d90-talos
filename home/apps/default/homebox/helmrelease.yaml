@@ -1,0 +1,142 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homebox
+  namespace: default
+spec:
+  interval: 5m
+
+  chart:
+    spec:
+      chart: homebox
+      version: "11.2.1"
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+
+    # ───────────────────────────────────────────────
+    # Disable built-in CNPG — we manage the cluster
+    # externally via database.yaml
+    # ───────────────────────────────────────────────
+    cnpg:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable metrics to avoid ServiceMonitor CRDs
+    # ───────────────────────────────────────────────
+    metrics:
+      main:
+        enabled: false
+        serviceMonitor:
+          enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable built-in ingress
+    # ───────────────────────────────────────────────
+    ingress:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Service definition
+    # ───────────────────────────────────────────────
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 10603
+            targetPort: 10603
+
+    # ───────────────────────────────────────────────
+    # Persistence (config/data)
+    # ───────────────────────────────────────────────
+    persistence:
+      data:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 5Gi
+        existingClaim: ""
+        mountPath: /data
+
+    # ───────────────────────────────────────────────
+    # Workload + probes + postgres env vars
+    # ───────────────────────────────────────────────
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+
+        podSpec:
+          securityContext:
+            container:
+              readOnlyRootFilesystem: false
+
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+
+              ports:
+                - name: main
+                  containerPort: 10603
+
+              env:
+                HBOX_DATABASE_DRIVER: "postgres"
+                HBOX_DATABASE_HOST: "homebox-postgres-rw"
+                HBOX_DATABASE_PORT: "5432"
+                HBOX_DATABASE_USERNAME: "homebox"
+                HBOX_DATABASE_DATABASE: "homebox"
+                HBOX_DATABASE_SSL_MODE: "disable"
+                HBOX_DATABASE_PASSWORD:
+                  secretKeyRef:
+                    name: homebox-postgres-secret
+                    key: password
+                HBOX_AUTH_API_KEY_PEPPER:
+                  secretKeyRef:
+                    name: homebox-postgres-secret
+                    key: api_key_pepper
+                HBOX_OPTIONS_TRUST_PROXY: "false"
+
+              probes:
+                readiness:
+                  enabled: true
+                  type: http
+                  path: /api/v1/status
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 12
+                  successThreshold: 1
+
+                liveness:
+                  enabled: true
+                  type: http
+                  path: /api/v1/status
+                  port: main
+                  initialDelaySeconds: 30
+                  periodSeconds: 20
+                  timeoutSeconds: 2
+                  failureThreshold: 10
+                  successThreshold: 1
+
+                startup:
+                  enabled: true
+                  type: http
+                  path: /api/v1/status
+                  port: main
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 90
