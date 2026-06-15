@@ -1,0 +1,26 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homebox
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://homebox.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: homebox
+    gethomepage.dev/group: Home
+    gethomepage.dev/icon: homebox.png
+    gethomepage.dev/name: homebox
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 10
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`homebox.d90.name`)
+    kind: Rule
+    services:
+    - name: homebox
+      kind: Service
+      port: 10603
+  tls:
+    secretName: tls.homebox
