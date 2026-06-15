@@ -4,6 +4,7 @@ resources:
   - bazarr.yaml
   - deluge.yaml
   - hass.yaml
+  - homebox.yaml
   - homepage.yaml
   # - jellyfin.yaml
   - lidarr.yaml
