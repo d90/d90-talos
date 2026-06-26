@@ -54,6 +54,12 @@ spec:
     # ───────────────────────────────────────────────
     persistence:
 
+      media:
+        enabled: true
+        type: pvc
+        existingClaim: nfs-pvc-data
+        mountPath: /media
+
       config:
         enabled: true
         type: pvc
