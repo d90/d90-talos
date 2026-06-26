@@ -128,18 +128,3 @@ spec:
                   periodSeconds: 10
                   timeoutSeconds: 2
                   failureThreshold: 90   # 15 minutes startup window
-  postRenderers:
-      - kustomize:
-          patches:
-            - target:
-                kind: Deployment
-                name: seerr
-              patch: |
-                - op: add
-                  path: /spec/template/spec/containers/0/env/-
-                  value:
-                    name: DB_PASS
-                    valueFrom:
-                      secretKeyRef:
-                        name: seerr-cnpg-main-user
-                        key: password
