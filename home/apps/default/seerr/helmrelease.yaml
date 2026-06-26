@@ -19,6 +19,13 @@ spec:
   values:
 
     # ───────────────────────────────────────────────
+    # Disable built-in CNPG cluster (we manage our own in database.yaml)
+    # ───────────────────────────────────────────────
+    cnpg:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
     # Disable metrics to avoid ServiceMonitor CRDs
     # ───────────────────────────────────────────────
     metrics:
