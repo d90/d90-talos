@@ -19,13 +19,6 @@ spec:
   values:
 
     # ───────────────────────────────────────────────
-    # Disable built-in CNPG cluster (we manage our own in database.yaml)
-    # ───────────────────────────────────────────────
-    cnpg:
-      main:
-        enabled: false
-
-    # ───────────────────────────────────────────────
     # Disable metrics to avoid ServiceMonitor CRDs
     # ───────────────────────────────────────────────
     metrics:
@@ -90,7 +83,7 @@ spec:
               imageSelector: image
               env: 
                 DB_TYPE: postgres
-                DB_HOST: seerr-postgres-rw
+                DB_HOST: seerr-cnpg-main-rw
                 DB_USER: seerr
                 DB_NAME: seerr
               # Correct container port
@@ -148,5 +141,5 @@ spec:
                     name: DB_PASS
                     valueFrom:
                       secretKeyRef:
-                        name: seerr-postgres-secret
-                        key: password  
+                        name: seerr-cnpg-main-user
+                        key: password
