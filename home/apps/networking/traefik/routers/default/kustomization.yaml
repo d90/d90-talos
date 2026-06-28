@@ -7,7 +7,7 @@ resources:
   - homebox.yaml
   - homepage.yaml
   # - jellyfin.yaml
-  - lidarr.yaml
+  # - lidarr.yaml
   - netbootxyz.yaml
   - nzbget.yaml
   - profilarr.yaml
