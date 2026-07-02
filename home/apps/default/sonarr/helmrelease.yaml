@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: sonarr
-      version: "26.4.0" # Ensure this matches the available Sonarr chart version in your repo
+      version: "26.6.0" # Ensure this matches the available Sonarr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
