@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: lidarr
-      version: "29.4.1" # Ensure this matches the available lidarr chart version in your repo
+      version: "29.6.0" # Ensure this matches the available lidarr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
