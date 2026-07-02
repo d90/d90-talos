@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: profilarr
-      version: "4.0.1" # Ensure this matches the available profilarr chart version in your repo
+      version: "4.2.0" # Ensure this matches the available profilarr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
