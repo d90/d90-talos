@@ -17,7 +17,7 @@ resources:
   - seerr.yaml
   - sonarr.yaml
   - tasmo.yaml
-  # - watchstate.yaml
+  - watchstate.yaml
   - webnettools.yaml
   - ext-qnap.yaml
   - ext-agh.yaml
