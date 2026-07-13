@@ -23,7 +23,7 @@ spec:
             - name: nfs-conf
               mountPath: /config
               subPath: watchstate/
-          image: ghcr.io/arabcoders/watchstate@sha256:47143eaa49135dfcdb3bbc351046c81ec1cfa7bf3c6a0141b08ed7b9c32b03d7
+          image: ghcr.io/arabcoders/watchstate:latest@sha256:9999a384d4ead0d3615e156c97243583d4ae2f3083d61ffe968334b96eca1459
           envFrom:
             - prefix: ''
               configMapRef:
