@@ -12,15 +12,27 @@
   "assignees": [
     "d90"
   ],
+  "automerge": true,
+  "automergeType": "pr",
+  "requiredStatusChecks": null,
   "packageRules": [
+    {
+      "description": "Never automerge major updates - leave these for manual review",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "major-update"
+      ]
+    },
     {
       "matchPackageNames": [
         "/linuxserver/"
       ],
       "labels": [
         "lsio"
-      ],
-      "automerge": true
+      ]
     },
     {
       "matchPackageNames": [
@@ -28,8 +40,7 @@
       ],
       "addLabels": [
         "media-stack"
-      ],
-      "automerge": true
+      ]
     },
     {
       "matchPackageNames": [
@@ -62,8 +73,7 @@
       "groupSlug": "fluxcd-non-major",
       "addLabels": [
         "fluxcd"
-      ],
-      "automerge": true
+      ]
     }
   ],
   "customManagers": [
