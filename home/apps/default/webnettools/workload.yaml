@@ -19,7 +19,7 @@ spec:
       containers:
         - imagePullPolicy: Always
           name: *app
-          image: johannesschafer/webnettools
+          image: johannesschafer/webnettools:1.3.0@sha256:a553770f94181ee3e56f3719ac946fd11ecea5787b3147c3ccb18bdd70aa8e33
           stdin: false
           stdinOnce: false
           tty: false

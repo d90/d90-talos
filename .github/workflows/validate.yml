@@ -1,0 +1,30 @@
+name: Validate manifests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - name: Setup kubectl, kustomize, kubeconform
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.31.0
+          kustomize: 5.4.3
+          kubeconform: 0.6.7
+          command: |
+            kustomize build home > /tmp/rendered.yaml
+            kubeconform \
+              -summary \
+              -verbose \
+              -skip Secret \
+              -skip CustomResourceDefinition \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+              /tmp/rendered.yaml
