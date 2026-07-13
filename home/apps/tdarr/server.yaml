@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: tdarr
-        image: ghcr.io/haveagitgat/tdarr:2.50.01@sha256:67d6a456d3c7963d2bc50318275843015af76e1f4dced3b1c5a91f8874d230bf
+        image: ghcr.io/haveagitgat/tdarr:2.83.01@sha256:f6dc6d9246cd8e02cc8c4a342eabe6dd63cad402ba43cd00b91a14e7e31fe470
         env:
           - name: NODE_ENV
             value: "production"
