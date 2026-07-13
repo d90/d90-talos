@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prowlarr
-      version: "22.8.2" # Ensure this matches the available prowlarr chart version in your repo
+      version: "22.8.3" # Ensure this matches the available prowlarr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
