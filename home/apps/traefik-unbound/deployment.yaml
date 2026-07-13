@@ -19,7 +19,7 @@ spec:
         runAsUser: 65532
       containers:
         - name: manager
-          image: ghcr.io/d90/traefik-to-opnsense-unbound:1.0.0@sha256:7702c82e188eb88de6411f03a91e146e00acc9cb5ed9a2c48b1948ecf22df85c
+          image: ghcr.io/d90/traefik-to-opnsense-unbound:1.0.0@sha256:44ffd3dac0e268ea307156f777729b35320d9fd21324065ed1ef62b707f772a1
           env:
             - name: OPNSENSE_URL
               value: "https://10.10.10.1"
