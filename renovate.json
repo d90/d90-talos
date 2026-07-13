@@ -14,7 +14,11 @@
   ],
   "automerge": true,
   "automergeType": "pr",
-  "requiredStatusChecks": null,
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/^home\\/(apps|core)\\/.+\\.ya?ml$/"
+    ]
+  },
   "packageRules": [
     {
       "description": "Never automerge major updates - leave these for manual review",
