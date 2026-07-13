@@ -24,7 +24,7 @@ spec:
         supplementalGroups: [44, 109, 1000] # 44=video, 109=render (Debian Trixie defaults)
       containers:
       - name: tdarr-node
-        image: ghcr.io/haveagitgat/tdarr_node@sha256:62e14509bc19dea9b6f5dc85d0942163b6fa240d780a53eb590d894d46c9e1f2
+        image: ghcr.io/haveagitgat/tdarr_node:2.50.02@sha256:54ac4196091993328a1c5f4e3dd2145cf3c4bb44590ea8b1e0a972292d7af63d
         env:
           - name: NODE_ENV
             value: "production"
