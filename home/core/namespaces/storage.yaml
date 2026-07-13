@@ -1,5 +1,7 @@
-# Namespace for Tdarr
+# Namespace for storage drivers (csi-driver-nfs)
 apiVersion: v1
 kind: Namespace
 metadata:
   name: storage
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
