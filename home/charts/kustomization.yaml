@@ -4,13 +4,13 @@ resources:
 - cilium.yaml
 - 1password.yaml
 - bitnami.yaml
-- bjw-s-charts.yaml
+# - bjw-s-charts.yaml
 - cloudnative-pg-charts.yaml
 - csi-driver-nfs.yaml
 - databasus.yaml
 - jetstack.yaml
 - nfs-subdir-external-provisioner.yaml
 - prometheus-community.yaml
-- traefik.yaml
+# - traefik.yaml
 - traefikv3.yaml
 - truecharts.yaml
