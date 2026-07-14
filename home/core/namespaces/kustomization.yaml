@@ -8,6 +8,5 @@ resources:
 - monitoring.yaml
 - networking.yaml
 - reloader.yaml
-- storage.yaml
 - traefik-unbound.yaml
 - tdarr.yaml
