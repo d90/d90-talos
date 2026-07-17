@@ -24,3 +24,4 @@ resources:
   - ext-emby.yaml
   - ext-hubitat.yaml
   - ext-unifi-os.yaml
+  - ext-jellyfin.yaml
