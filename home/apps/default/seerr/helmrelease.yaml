@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: seerr
-      version: "16.4.4" # Ensure this matches the available seerr chart version in your repo
+      version: "16.4.5" # Ensure this matches the available seerr chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
