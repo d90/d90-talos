@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: homepage
-      version: "13.1.1" # Ensure this matches the available homepage chart version in your repo
+      version: "13.3.0" # Ensure this matches the available homepage chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
