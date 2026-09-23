@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rtunnel
+  namespace: default
+data:
+  ssh_config: |
+    Host rutgers
+      HostName td-equality101-prod-asb.ei.rutgers.edu
+      User njd67
+      IdentityFile /etc/rtunnel-key/rusys
+      IdentitiesOnly yes
+      UserKnownHostsFile /etc/rtunnel/known_hosts
+      StrictHostKeyChecking yes
+      ExitOnForwardFailure yes
+      ServerAliveInterval 30
+      ServerAliveCountMax 3
+      # LAN-facing forwards (Service maps 445 -> 4445; ports >1024 so no root/caps needed)
+      LocalForward *:4445 isilon-1-asb-smb.ei.rutgers.edu:445
+      DynamicForward *:1080
+      # DNS forwards stay on loopback; the CoreDNS sidecar turns UDP/TCP queries into TCP over these
+      LocalForward 127.0.0.1:5301 128.6.1.2:53
+      LocalForward 127.0.0.1:5302 172.29.219.60:53
+  known_hosts: |
+    td-equality101-prod-asb.ei.rutgers.edu ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOsGcgQ9Vq3fcP5dajJTbzw/S1W5aE9V/Rpo5bewVojj
+  Corefile: |
+    # udns
+    .:5353 {
+        errors
+        forward . 127.0.0.1:5301 {
+            force_tcp
+        }
+    }
+    # unbound
+    .:5354 {
+        errors
+        forward . 127.0.0.1:5302 {
+            force_tcp
+        }
+    }
