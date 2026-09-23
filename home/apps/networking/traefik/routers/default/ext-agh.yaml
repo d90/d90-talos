@@ -1,67 +1,145 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: agh
-  namespace: default
+    name: agh
+    namespace: default
 spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  clusterIP: None
+    ports:
+        - port: 80
+          targetPort: 80
+    clusterIP: None
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHWDQ3QVNwNm4xeW8ydzdl
+            RjJLVmIwUTEzcHV1TWxiaHByNm41RHY0dFJRCkl5YnJLWGRZcnA4bXNPRFh5Uk5N
+            OSs4K21tamp0YUNzKzVWZndiWTRmT1UKLS0tIGVmMmhBS1FqclVjL3Uyd1pGamJa
+            d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
+            u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-09-23T17:44:20Z"
+    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.password)$
+    version: 3.9.0
 ---
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: agh
-  namespace: default
+    name: agh
+    namespace: default
 subsets:
-  - addresses:
-      - ip: 10.10.10.231
-    ports:
-      - port: 80
+    - addresses:
+        - ip: 10.10.10.231
+      ports:
+        - port: 80
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHWDQ3QVNwNm4xeW8ydzdl
+            RjJLVmIwUTEzcHV1TWxiaHByNm41RHY0dFJRCkl5YnJLWGRZcnA4bXNPRFh5Uk5N
+            OSs4K21tamp0YUNzKzVWZndiWTRmT1UKLS0tIGVmMmhBS1FqclVjL3Uyd1pGamJa
+            d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
+            u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-09-23T17:44:20Z"
+    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.password)$
+    version: 3.9.0
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: agh
-  namespace: default
-  annotations:
-    gethomepage.dev/href: "https://agh.d90.name"
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/group: Network
-    gethomepage.dev/icon: adguard-home
-    gethomepage.dev/name: adguard
-    gethomepage.dev/widget.type: "adguard"
-    gethomepage.dev/widget.url: "https://agh.d90.name"
-    gethomepage.dev/widget.username: "d90"
-    gethomepage.dev/widget.password: "***REMOVED***"
+    name: agh
+    namespace: default
+    annotations:
+        gethomepage.dev/href: https://agh.d90.name
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/group: Network
+        gethomepage.dev/icon: adguard-home
+        gethomepage.dev/name: adguard
+        gethomepage.dev/widget.type: adguard
+        gethomepage.dev/widget.url: https://agh.d90.name
+        gethomepage.dev/widget.username: d90
+        gethomepage.dev/widget.password: ENC[AES256_GCM,data:LcUB2pi0TE5Vh5NfbJOKMQ==,iv:WjbQfSgxE4L4Ca+e1y64T/3X5MNTVXx9fkNKhAbA774=,tag:WEvfpTsGCrWomS0flM95HQ==,type:str]
 spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`agh.d90.name`)
-      kind: Rule
-      services:
-        - name: agh
-          port: 80
-  tls:
-    secretName: tls.agh
-
+    entryPoints:
+        - websecure
+    routes:
+        - match: Host(`agh.d90.name`)
+          kind: Rule
+          services:
+            - name: agh
+              port: 80
+    tls:
+        secretName: tls.agh
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHWDQ3QVNwNm4xeW8ydzdl
+            RjJLVmIwUTEzcHV1TWxiaHByNm41RHY0dFJRCkl5YnJLWGRZcnA4bXNPRFh5Uk5N
+            OSs4K21tamp0YUNzKzVWZndiWTRmT1UKLS0tIGVmMmhBS1FqclVjL3Uyd1pGamJa
+            d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
+            u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-09-23T17:44:20Z"
+    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.password)$
+    version: 3.9.0
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls.agh
-  namespace: default
+    name: tls.agh
+    namespace: default
 spec:
-  dnsNames:
-    - agh.d90.name
-  secretName: tls.agh
-  privateKey:
-    algorithm: ECDSA
-    size: 256
-  revisionHistoryLimit: 1
-  issuerRef:
-    name: le-prod-issuer
-    kind: ClusterIssuer
-
+    dnsNames:
+        - agh.d90.name
+    secretName: tls.agh
+    privateKey:
+        algorithm: ECDSA
+        size: 256
+    revisionHistoryLimit: 1
+    issuerRef:
+        name: le-prod-issuer
+        kind: ClusterIssuer
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1qvmjlpa0m679rfgw5p00gpy25c3gan3pg4ad56x4z3g2mhqguf2s2dsy7u
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHWDQ3QVNwNm4xeW8ydzdl
+            RjJLVmIwUTEzcHV1TWxiaHByNm41RHY0dFJRCkl5YnJLWGRZcnA4bXNPRFh5Uk5N
+            OSs4K21tamp0YUNzKzVWZndiWTRmT1UKLS0tIGVmMmhBS1FqclVjL3Uyd1pGamJa
+            d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
+            u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-09-23T17:44:20Z"
+    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    pgp: []
+    encrypted_regex: ^(gethomepage.dev/widget.password)$
+    version: 3.9.0
