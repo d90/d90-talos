@@ -10,5 +10,6 @@ resources:
 - tls.yaml
 configMapGenerator:
 - name: rtunnel-status
+  namespace: default
   files:
   - status.py
