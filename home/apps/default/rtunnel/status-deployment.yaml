@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app rtunnel-status
+  namespace: default
+  labels:
+    app: *app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+        - name: status
+          image: python:3.13-alpine@sha256:79e7a9b9ff1cbceff819f856fb374477792a5967759d94df266de7b7b4120e6f
+          command: ["python", "-u", "/app/status.py"]
+          env:
+            - { name: PYTHONDONTWRITEBYTECODE, value: "1" }
+            - { name: TUNNEL_HOST, value: rtunnel }
+            - { name: LB_IP, value: "10.10.100.102" }
+          ports:
+            - { name: http, containerPort: 8080, protocol: TCP }
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 10m, memory: 24Mi }
+            limits: { memory: 96Mi }
+          volumeMounts:
+            - { name: app, mountPath: /app, readOnly: true }
+            - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+      volumes:
+        - name: app
+          configMap:
+            name: rtunnel-status
+        - name: config
+          configMap:
+            name: rtunnel
