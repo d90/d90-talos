@@ -13,6 +13,7 @@ resources:
   - profilarr.yaml
   - prowlarr.yaml
   - radarr.yaml
+  - rtunnel.yaml
   # - scrypted.yaml
   - seerr.yaml
   - sonarr.yaml

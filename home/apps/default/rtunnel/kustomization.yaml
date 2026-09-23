@@ -5,3 +5,10 @@ resources:
 - deployment.yaml
 - service.yaml
 - secret.sops.yaml
+- status-deployment.yaml
+- status-service.yaml
+- tls.yaml
+configMapGenerator:
+- name: rtunnel-status
+  files:
+  - status.py
