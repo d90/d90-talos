@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app rtunnel
+  namespace: default
+  labels:
+    app: *app
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+        - name: ssh
+          image: kroniak/ssh-client:3.23@sha256:cfb58718a2cfbb248214a9c33655f16438e0f1014c054e0e524d3eb232ccdb2b
+          command: ["ssh"]
+          args: ["-N", "-F", "/etc/rtunnel/ssh_config", "rutgers"]
+          ports:
+            - { name: smb, containerPort: 4445, protocol: TCP }
+            - { name: socks, containerPort: 1080, protocol: TCP }
+          readinessProbe:
+            tcpSocket: { port: socks }
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: { port: socks }
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { memory: 64Mi }
+          volumeMounts:
+            - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+            - { name: rusys, mountPath: /etc/rtunnel-key, readOnly: true }
+        - name: dns
+          image: coredns/coredns:1.14.7@sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286
+          args: ["-conf", "/etc/rtunnel/Corefile"]
+          ports:
+            - { name: udns-udp, containerPort: 5353, protocol: UDP }
+            - { name: udns-tcp, containerPort: 5353, protocol: TCP }
+            - { name: unbound-udp, containerPort: 5354, protocol: UDP }
+            - { name: unbound-tcp, containerPort: 5354, protocol: TCP }
+          readinessProbe:
+            tcpSocket: { port: udns-tcp }
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: { port: udns-tcp }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { memory: 64Mi }
+          volumeMounts:
+            - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+      volumes:
+        - name: config
+          configMap:
+            name: *app
+        - name: rusys
+          secret:
+            secretName: rtunnel-ssh
+            # ssh only enforces 0600 when the file owner is the running uid; kubelet makes it root:fsGroup, so 0440 + fsGroup works
+            defaultMode: 0440

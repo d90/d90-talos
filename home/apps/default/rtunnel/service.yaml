@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtunnel
+  namespace: default
+  annotations:
+    io.cilium/lb-ipam-ips: "10.10.100.102"
+spec:
+  type: LoadBalancer
+  selector:
+    app: rtunnel
+  ports:
+    - { name: smb, port: 445, targetPort: 4445, protocol: TCP }
+    - { name: socks, port: 1080, targetPort: 1080, protocol: TCP }
+    - { name: udns-udp, port: 5353, targetPort: 5353, protocol: UDP }
+    - { name: udns-tcp, port: 5353, targetPort: 5353, protocol: TCP }
+    - { name: unbound-udp, port: 5354, targetPort: 5354, protocol: UDP }
+    - { name: unbound-tcp, port: 5354, targetPort: 5354, protocol: TCP }
