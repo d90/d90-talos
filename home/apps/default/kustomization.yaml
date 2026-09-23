@@ -17,6 +17,7 @@ resources:
 - profilarr
 - prowlarr
 - radarr
+- rtunnel
 - scrypted
 - seerr
 - sonarr
