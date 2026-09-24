@@ -23,8 +23,8 @@ sops:
             d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
             u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-23T17:44:20Z"
-    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    lastmodified: "2026-09-24T19:20:13Z"
+    mac: ENC[AES256_GCM,data:/Pt07Ft4K99pviD9JUXIY986fsQ4xsp6Qybpc0nAoUtMcHCsPGqsZCKB4A2T7k/sRYRQVR931ihrUNl6ITLPNQhTZO2pE25R3v/kjM1qmP+B+oaPGSJSRQ78PYnhmGXxHGJVtepThcPRXTq09ztywe4H6OJEHeoc1C+IfNW8TGU=,iv:+WSG1ECrnsGiqoTRdAfh+B4+/NxaYCosmgZ4xTkMnkA=,tag:oE5EYWWrICanX0sL9HtpbQ==,type:str]
     pgp: []
     encrypted_regex: ^(gethomepage.dev/widget.password)$
     version: 3.9.0
@@ -54,8 +54,8 @@ sops:
             d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
             u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-23T17:44:20Z"
-    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    lastmodified: "2026-09-24T19:20:13Z"
+    mac: ENC[AES256_GCM,data:/Pt07Ft4K99pviD9JUXIY986fsQ4xsp6Qybpc0nAoUtMcHCsPGqsZCKB4A2T7k/sRYRQVR931ihrUNl6ITLPNQhTZO2pE25R3v/kjM1qmP+B+oaPGSJSRQ78PYnhmGXxHGJVtepThcPRXTq09ztywe4H6OJEHeoc1C+IfNW8TGU=,iv:+WSG1ECrnsGiqoTRdAfh+B4+/NxaYCosmgZ4xTkMnkA=,tag:oE5EYWWrICanX0sL9HtpbQ==,type:str]
     pgp: []
     encrypted_regex: ^(gethomepage.dev/widget.password)$
     version: 3.9.0
@@ -74,7 +74,7 @@ metadata:
         gethomepage.dev/widget.type: adguard
         gethomepage.dev/widget.url: https://agh.d90.name
         gethomepage.dev/widget.username: d90
-        gethomepage.dev/widget.password: ENC[AES256_GCM,data:LcUB2pi0TE5Vh5NfbJOKMQ==,iv:WjbQfSgxE4L4Ca+e1y64T/3X5MNTVXx9fkNKhAbA774=,tag:WEvfpTsGCrWomS0flM95HQ==,type:str]
+        gethomepage.dev/widget.password: ENC[AES256_GCM,data:f5IndJPrk9oLbPUJFzJLJkqAEM4=,iv:PwrsH7SNm7xyo1j6w1uvX9eEGlpWQDTs1J11qjMIzI0=,tag:PbA27FOMCY9umEzEXFdwXg==,type:str]
 spec:
     entryPoints:
         - websecure
@@ -101,8 +101,8 @@ sops:
             d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
             u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-23T17:44:20Z"
-    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    lastmodified: "2026-09-24T19:20:13Z"
+    mac: ENC[AES256_GCM,data:/Pt07Ft4K99pviD9JUXIY986fsQ4xsp6Qybpc0nAoUtMcHCsPGqsZCKB4A2T7k/sRYRQVR931ihrUNl6ITLPNQhTZO2pE25R3v/kjM1qmP+B+oaPGSJSRQ78PYnhmGXxHGJVtepThcPRXTq09ztywe4H6OJEHeoc1C+IfNW8TGU=,iv:+WSG1ECrnsGiqoTRdAfh+B4+/NxaYCosmgZ4xTkMnkA=,tag:oE5EYWWrICanX0sL9HtpbQ==,type:str]
     pgp: []
     encrypted_regex: ^(gethomepage.dev/widget.password)$
     version: 3.9.0
@@ -138,8 +138,8 @@ sops:
             d0lpdW1BVWQwSmZpM3lGK2ZKb0RjaEEKjzDm4tR92VnyAJDKUv2igiskpFCFvxC2
             u7MqyrtP1XoGsWnyE0V2Oqm15SoOMSh6aSIFc+FxN7LRfSqtzsvhHw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-23T17:44:20Z"
-    mac: ENC[AES256_GCM,data:T164+zmiPFGvLmUmICeLrVdO1POsgvoYyfv6zUQRuMUrlrxctVQJVNk4/uiD/n1nwHRnV0vjOLmuDN7lgdXu8FotrhDICKGfNak62eK78O1grY35E3lZOWpyZ3RAGeYdyVCPmJ/pdT5hgWRyRDwGoD5Z4T0koO8aO4zYD7kuEII=,iv:NzCM5vkQhzw80VVbRcr2UaQ0kLry2xxj1w+DhaU3lZg=,tag:Ole0Ztt0OYdhMgCVShXW9A==,type:str]
+    lastmodified: "2026-09-24T19:20:13Z"
+    mac: ENC[AES256_GCM,data:/Pt07Ft4K99pviD9JUXIY986fsQ4xsp6Qybpc0nAoUtMcHCsPGqsZCKB4A2T7k/sRYRQVR931ihrUNl6ITLPNQhTZO2pE25R3v/kjM1qmP+B+oaPGSJSRQ78PYnhmGXxHGJVtepThcPRXTq09ztywe4H6OJEHeoc1C+IfNW8TGU=,iv:+WSG1ECrnsGiqoTRdAfh+B4+/NxaYCosmgZ4xTkMnkA=,tag:oE5EYWWrICanX0sL9HtpbQ==,type:str]
     pgp: []
     encrypted_regex: ^(gethomepage.dev/widget.password)$
     version: 3.9.0
