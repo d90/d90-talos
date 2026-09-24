@@ -202,6 +202,7 @@ PAGE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>rtunnel status</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
 :root {
   --bg: #f6f7f9; --card: #ffffff; --text: #1b1f24; --muted: #5c6670; --line: #dde1e6;
@@ -367,6 +368,13 @@ setInterval(load, 5000);
 </html>
 """.encode()
 
+# Rutgers scarlet (#CC0033) tile with a white R
+FAVICON = b"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<rect width="64" height="64" rx="14" fill="#cc0033"/>
+<text x="32" y="47" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" fill="#fff">R</text>
+</svg>
+"""
+
 
 class Handler(BaseHTTPRequestHandler):
     def send(self, code, body, ctype):
@@ -383,6 +391,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200, PAGE, "text/html; charset=utf-8")
         elif path == "/api/status":
             self.send(200, json.dumps(snapshot()).encode(), "application/json")
+        elif path == "/favicon.svg":
+            self.send(200, FAVICON, "image/svg+xml")
         elif path == "/healthz":
             self.send(200, b"ok", "text/plain")
         else:
