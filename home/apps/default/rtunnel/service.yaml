@@ -11,6 +11,7 @@ spec:
     app: rtunnel
   ports:
     - { name: smb, port: 445, targetPort: 4445, protocol: TCP }
+    - { name: rdp, port: 3389, targetPort: 3390, protocol: TCP }
     - { name: socks, port: 1080, targetPort: 1080, protocol: TCP }
     - { name: udns-udp, port: 5353, targetPort: 5353, protocol: UDP }
     - { name: udns-tcp, port: 5353, targetPort: 5353, protocol: TCP }
