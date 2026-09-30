@@ -74,7 +74,11 @@ def check_smb():
 
 def x224_connection_request():
     tpdu = b"\xe0\x00\x00\x00\x00\x00"  # CR code, dst-ref, src-ref, class option
-    x224 = bytes([len(tpdu)]) + tpdu
+    # RDP Negotiation Request: advertise TLS + CredSSP/NLA support, like a real client -
+    # NLA-only servers drop the connection outright if this is missing.
+    neg_req = struct.pack("<BBHI", 0x01, 0x00, 8, 0x00000003)
+    body = tpdu + neg_req
+    x224 = bytes([len(body)]) + body
     return b"\x03\x00" + struct.pack(">H", 4 + len(x224)) + x224
 
 
