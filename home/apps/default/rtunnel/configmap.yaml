@@ -17,6 +17,7 @@ data:
       ServerAliveCountMax 3
       # LAN-facing forwards (Service maps 445 -> 4445; ports >1024 so no root/caps needed)
       LocalForward *:4445 isilon-1-asb-smb.ei.rutgers.edu:445
+      LocalForward *:3390 eiasb110c06d01.rad.rutgers.edu:3389
       DynamicForward *:1080
       # DNS forwards stay on loopback; the CoreDNS sidecar turns UDP/TCP queries into TCP over these
       LocalForward 127.0.0.1:5301 128.6.1.2:53

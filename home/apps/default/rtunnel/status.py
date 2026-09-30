@@ -16,7 +16,7 @@ INTERVAL = int(os.environ.get("CHECK_INTERVAL", "30"))
 SSH_CONFIG = os.environ.get("SSH_CONFIG", "/etc/rtunnel/ssh_config")
 LISTEN_PORT = int(os.environ.get("PORT", "8080"))
 TIMEOUT = 6
-PORTS = {"socks": 1080, "smb": 445, "udns": 5353, "unbound": 5354}
+PORTS = {"socks": 1080, "smb": 445, "rdp": 3389, "udns": 5353, "unbound": 5354}
 RCODES = {1: "FORMERR", 2: "SERVFAIL", 3: "NXDOMAIN", 4: "NOTIMP", 5: "REFUSED"}
 
 LOCK = threading.Lock()
@@ -72,6 +72,27 @@ def check_smb():
     return elapsed, detail
 
 
+def x224_connection_request():
+    tpdu = b"\xe0\x00\x00\x00\x00\x00"  # CR code, dst-ref, src-ref, class option
+    x224 = bytes([len(tpdu)]) + tpdu
+    return b"\x03\x00" + struct.pack(">H", 4 + len(x224)) + x224
+
+
+def check_rdp():
+    with socket.create_connection((HOST, PORTS["rdp"]), TIMEOUT) as s:
+        s.settimeout(TIMEOUT)
+        t = time.monotonic()
+        s.sendall(x224_connection_request())
+        head = read_exact(s, 4)
+        resp = read_exact(s, struct.unpack(">H", head[2:4])[0] - 4)
+    elapsed = ms(t)
+    if head[0] != 3:
+        raise RuntimeError("reply was not TPKT")
+    if len(resp) < 2 or resp[1] != 0xD0:
+        raise RuntimeError("expected X.224 connection confirm")
+    return elapsed, "X.224 connection confirm ok"
+
+
 def skip_name(buf, i):
     while True:
         n = buf[i]
@@ -116,6 +137,7 @@ def check_dns(port):
 CHECKS = [
     ("ssh", "SSH tunnel", "Local SOCKS listener answers, so the ssh client is running", check_socks),
     ("smb", "SMB forward", "SMB2 negotiate through the tunnel to the file server", check_smb),
+    ("rdp", "RDP forward", "X.224 connection request/confirm through the tunnel to the RDP host", check_rdp),
     ("udns", "DNS · udns", "UDP query to CoreDNS, forwarded over TCP through the tunnel", lambda: check_dns(PORTS["udns"])),
     ("unbound", "DNS · unbound", "UDP query to CoreDNS, forwarded over TCP through the tunnel", lambda: check_dns(PORTS["unbound"])),
 ]
@@ -188,6 +210,7 @@ def snapshot():
     ip = LB_IP or HOST
     endpoints = [
         {"name": "SMB", "addr": "%s:445" % ip, "proto": "TCP"},
+        {"name": "RDP", "addr": "%s:3389" % ip, "proto": "TCP"},
         {"name": "SOCKS5", "addr": "%s:1080" % ip, "proto": "TCP"},
         {"name": "DNS · udns", "addr": "%s:5353" % ip, "proto": "UDP/TCP"},
         {"name": "DNS · unbound", "addr": "%s:5354" % ip, "proto": "UDP/TCP"},

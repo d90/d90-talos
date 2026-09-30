@@ -32,6 +32,7 @@ spec:
           args: ["-N", "-F", "/etc/rtunnel/ssh_config", "rutgers"]
           ports:
             - { name: smb, containerPort: 4445, protocol: TCP }
+            - { name: rdp, containerPort: 3390, protocol: TCP }
             - { name: socks, containerPort: 1080, protocol: TCP }
           readinessProbe:
             tcpSocket: { port: socks }
