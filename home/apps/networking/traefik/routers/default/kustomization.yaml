@@ -10,6 +10,7 @@ resources:
   # - lidarr.yaml
   - netbootxyz.yaml
   - nzbget.yaml
+  - peptide-pitstop.yaml
   - profilarr.yaml
   - prowlarr.yaml
   - radarr.yaml

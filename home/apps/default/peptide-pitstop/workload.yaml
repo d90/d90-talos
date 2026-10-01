@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app peptide-pitstop
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: *app
+          image: ghcr.io/kavo91/peptide-pitstop:1.25.3@sha256:ca41806ef957f7869aa7aca0d394545229b6aa2a172aab646243b91aae3d6bb4
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: file:/data/peptides.db
+            - name: COOKIE_SECURE
+              value: "true"
+            - name: TZ
+              value: America/New_York
+          envFrom:
+            - prefix: ''
+              secretRef:
+                name: peptide-pitstop-secret
+                optional: false
+          volumeMounts:
+            - name: nfs-conf
+              mountPath: /data
+              subPath: peptide-pitstop/
+          readinessProbe:
+            httpGet:
+              path: /api/version
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /api/version
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 10
+      restartPolicy: Always
+      volumes:
+        - name: nfs-conf
+          persistentVolumeClaim:
+            claimName: nfs-pvc-containerdata
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate

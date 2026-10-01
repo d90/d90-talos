@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: peptide-pitstop
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://peptide-pitstop.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: Peptide & GLP-1 tracker
+    gethomepage.dev/group: Home
+    gethomepage.dev/icon: mdi-needle
+    gethomepage.dev/name: Peptide Pitstop
+    gethomepage.dev/pod-selector: ""
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`peptide-pitstop.d90.name`)
+    kind: Rule
+    services:
+    - name: peptide-pitstop
+      kind: Service
+      port: 3000
+  tls:
+    secretName: tls.peptide-pitstop
