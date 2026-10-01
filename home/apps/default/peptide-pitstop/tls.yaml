@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls.peptide-pitstop
+  namespace: default
+spec:
+  dnsNames:
+    - peptide-pitstop.d90.name
+  secretName: tls.peptide-pitstop
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: le-prod-issuer
+    kind: ClusterIssuer
