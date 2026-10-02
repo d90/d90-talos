@@ -21,6 +21,17 @@ spec:
               - matchPattern: "*"
     # Prisma CLI check-in is disabled via CHECKPOINT_DISABLE=1 (workload.yaml), so no
     # toFQDNs rule for checkpoint.prisma.io is needed.
+    #
+    # `prisma migrate deploy` fetches the query-engine binary checksum from this
+    # Cloudflare-fronted CDN on every startup, independent of CHECKPOINT_DISABLE.
+    # Without it, migrations silently skip instead of failing loudly. Observed
+    # live via pod logs + Hubble after the DNS-only policy went into enforcement.
+    - toFQDNs:
+        - matchName: "binaries.prisma.sh"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Uncomment and adjust if optional features are enabled later:
     # - toFQDNs:
     #     - matchName: "peptidedosages.com"   # only if the dosage scraper feature is used
