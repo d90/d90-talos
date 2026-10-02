@@ -29,7 +29,7 @@ spec:
       - "--serversTransport.insecureSkipVerify=true"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=metrics"
-      - "--providers.kubernetescrd.namespaces=default,monitoring,networking,tdarr,flux-system,databasus"
+      - "--providers.kubernetescrd.namespaces=default,monitoring,networking,tdarr,flux-system,databasus,kube-system"
 
     ports:
       web:
