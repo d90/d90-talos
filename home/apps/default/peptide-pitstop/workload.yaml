@@ -43,7 +43,6 @@ spec:
             runAsUser: 1001
             runAsGroup: 1001
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
           ports:
@@ -69,8 +68,6 @@ spec:
             - name: nfs-conf
               mountPath: /data
               subPath: peptide-pitstop/
-            - name: tmp
-              mountPath: /tmp
           readinessProbe:
             httpGet:
               path: /api/version
@@ -91,8 +88,6 @@ spec:
         - name: nfs-conf
           persistentVolumeClaim:
             claimName: nfs-pvc-containerdata
-        - name: tmp
-          emptyDir: {}
   replicas: 1
   revisionHistoryLimit: 2
   strategy:
