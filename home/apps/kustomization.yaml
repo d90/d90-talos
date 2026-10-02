@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - databasus
   - default
+  - hubble
   - networking/traefik/routers
   - traefik-unbound
   - tdarr
