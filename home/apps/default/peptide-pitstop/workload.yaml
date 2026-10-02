@@ -16,10 +16,36 @@ spec:
       labels:
         app: *app
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: fix-data-perms
+          image: busybox:1.36
+          command: ["chown", "-R", "1001:1001", "/data"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: nfs-conf
+              mountPath: /data
+              subPath: peptide-pitstop/
       containers:
         - imagePullPolicy: IfNotPresent
           name: *app
           image: ghcr.io/kavo91/peptide-pitstop:1.25.3@sha256:ca41806ef957f7869aa7aca0d394545229b6aa2a172aab646243b91aae3d6bb4
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           ports:
             - name: http
               containerPort: 3000
@@ -43,6 +69,8 @@ spec:
             - name: nfs-conf
               mountPath: /data
               subPath: peptide-pitstop/
+            - name: tmp
+              mountPath: /tmp
           readinessProbe:
             httpGet:
               path: /api/version
@@ -63,6 +91,8 @@ spec:
         - name: nfs-conf
           persistentVolumeClaim:
             claimName: nfs-pvc-containerdata
+        - name: tmp
+          emptyDir: {}
   replicas: 1
   revisionHistoryLimit: 2
   strategy:
