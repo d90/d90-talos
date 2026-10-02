@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: fix-data-perms
-          image: busybox:1.36
+          image: busybox:1.38
           command: ["chown", "-R", "1001:1001", "/data"]
           securityContext:
             runAsUser: 0
