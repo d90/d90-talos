@@ -66,10 +66,10 @@ spec:
     externalIPs:
       enabled: true
 
-    # Hubble observability (disabled for now, enable later)
+    # Hubble observability
     hubble:
-      enabled: false
+      enabled: true
       relay:
-        enabled: false
+        enabled: true
       ui:
-        enabled: false
+        enabled: true

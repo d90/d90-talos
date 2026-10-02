@@ -30,6 +30,10 @@ spec:
               value: "true"
             - name: TZ
               value: America/New_York
+            - name: CHECKPOINT_DISABLE
+              value: "1"
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
           envFrom:
             - prefix: ''
               secretRef:

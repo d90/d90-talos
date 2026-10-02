@@ -1,0 +1,30 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: peptide-pitstop-egress
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      app: peptide-pitstop
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Prisma CLI check-in is disabled via CHECKPOINT_DISABLE=1 (workload.yaml), so no
+    # toFQDNs rule for checkpoint.prisma.io is needed.
+    # Uncomment and adjust if optional features are enabled later:
+    # - toFQDNs:
+    #     - matchName: "peptidedosages.com"   # only if the dosage scraper feature is used
+    #   toPorts:
+    #     - ports:
+    #         - port: "443"
+    #           protocol: TCP
