@@ -4,6 +4,7 @@ resources:
 - configmap.yaml
 - deployment.yaml
 - service.yaml
+- netmon-service.yaml
 - secret.sops.yaml
 - status-deployment.yaml
 - status-service.yaml
@@ -13,3 +14,7 @@ configMapGenerator:
   namespace: default
   files:
   - status.py
+- name: rtunnel-netmon
+  namespace: default
+  files:
+  - netmon.py

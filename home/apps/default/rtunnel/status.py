@@ -6,6 +6,8 @@ import socket
 import struct
 import threading
 import time
+import urllib.request
+from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -14,6 +16,7 @@ LB_IP = os.environ.get("LB_IP", "")
 DNS_NAME = os.environ.get("DNS_TEST_NAME", "rutgers.edu")
 INTERVAL = int(os.environ.get("CHECK_INTERVAL", "30"))
 SSH_CONFIG = os.environ.get("SSH_CONFIG", "/etc/rtunnel/ssh_config")
+NETMON_URL = os.environ.get("NETMON_URL", "http://rtunnel-netmon/metrics")
 LISTEN_PORT = int(os.environ.get("PORT", "8080"))
 TIMEOUT = 6
 PORTS = {"socks": 1080, "smb": 445, "rdp": 3389, "udns": 5353, "unbound": 5354}
@@ -23,6 +26,9 @@ LOCK = threading.Lock()
 STATE = {}
 REFRESH = threading.Event()
 LAST_RUN = [0.0]
+
+NET_LOCK = threading.Lock()
+NET_HISTORY = deque(maxlen=120)  # (timestamp, rx_bytes, tx_bytes), one per check interval
 
 
 def ms(t0):
@@ -160,10 +166,22 @@ def run_check(key, fn):
         STATE[key] = {"ok": ok, "detail": detail, "ms": latency, "since": since, "checked": now}
 
 
+def sample_netmon():
+    try:
+        with urllib.request.urlopen(NETMON_URL, timeout=TIMEOUT) as r:
+            d = json.loads(r.read())
+        rx, tx = d["rx_bytes"], d["tx_bytes"]
+    except Exception:
+        return
+    with NET_LOCK:
+        NET_HISTORY.append((time.time(), rx, tx))
+
+
 def check_loop():
     with ThreadPoolExecutor(max_workers=len(CHECKS)) as pool:
         while True:
             list(pool.map(lambda c: run_check(c[0], c[3]), CHECKS))
+            sample_netmon()
             LAST_RUN[0] = time.time()
             REFRESH.wait(INTERVAL)
             REFRESH.clear()
@@ -188,6 +206,31 @@ def read_config():
         pass
     info["jump"] = "%s@%s" % (user, host) if host else ""
     return info
+
+
+def bandwidth_snapshot():
+    with NET_LOCK:
+        hist = list(NET_HISTORY)
+    if len(hist) < 2:
+        last = hist[-1] if hist else None
+        return {"available": False, "rate_in": None, "rate_out": None,
+                "total_in": last[1] if last else None, "total_out": last[2] if last else None,
+                "history": []}
+    rates = []
+    for (t0, rx0, tx0), (t1, rx1, tx1) in zip(hist, hist[1:]):
+        dt = max(t1 - t0, 1e-6)
+        rates.append(max((rx1 - rx0) + (tx1 - tx0), 0) / dt)
+    t0, rx0, tx0 = hist[-2]
+    t1, rx1, tx1 = hist[-1]
+    dt = max(t1 - t0, 1e-6)
+    return {
+        "available": True,
+        "rate_in": max(rx1 - rx0, 0) / dt,
+        "rate_out": max(tx1 - tx0, 0) / dt,
+        "total_in": rx1,
+        "total_out": tx1,
+        "history": rates,
+    }
 
 
 def snapshot():
@@ -220,7 +263,8 @@ def snapshot():
         {"name": "DNS · unbound", "addr": "%s:5354" % ip, "proto": "UDP/TCP"},
     ]
     return {"overall": overall, "checks": checks, "endpoints": endpoints, "jump": cfg["jump"],
-            "forwards": cfg["forwards"], "interval": INTERVAL, "dns_test": DNS_NAME}
+            "forwards": cfg["forwards"], "interval": INTERVAL, "dns_test": DNS_NAME,
+            "bandwidth": bandwidth_snapshot()}
 
 
 PAGE = """<!doctype html>
@@ -279,6 +323,7 @@ button { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; 
   border: 1px solid var(--line); background: var(--card); color: var(--text); }
 button:hover { border-color: var(--muted); }
 .stale { opacity: .55; }
+.spark { display: block; width: 100%; height: 56px; color: var(--ok); }
 </style>
 </head>
 <body>
@@ -298,6 +343,31 @@ button:hover { border-color: var(--muted); }
     <h2>Health checks</h2>
     <div class="grid" id="checks"></div>
     <div class="sub" id="footer" style="margin-top:10px"></div>
+  </section>
+
+  <section>
+    <h2>Bandwidth</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="top"><span class="name">Inbound</span></div>
+        <div class="detail" id="bw-in">–</div>
+        <div class="meta">into the pod · clients + tunnel replies</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="name">Outbound</span></div>
+        <div class="detail" id="bw-out">–</div>
+        <div class="meta">out of the pod · tunnel traffic + client replies</div>
+      </div>
+      <div class="card">
+        <div class="top"><span class="name">Total transferred</span></div>
+        <div class="detail" id="bw-total">–</div>
+        <div class="meta">since the tunnel pod last started</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <svg class="spark" id="bw-spark" preserveAspectRatio="none"></svg>
+      <div class="meta" id="bw-spark-meta">Combined throughput, most recent checks</div>
+    </div>
   </section>
 
   <section>
@@ -329,6 +399,35 @@ function el(tag, cls, text) {
   if (text !== undefined) e.textContent = text;
   return e;
 }
+function fmtBytes(n) {
+  if (n === null || n === undefined) return "–";
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let v = n, i = 0;
+  while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+  return (i === 0 ? v : v.toFixed(v < 10 ? 1 : 0)) + " " + units[i];
+}
+function fmtRate(n) {
+  return n === null || n === undefined ? "–" : fmtBytes(n) + "/s";
+}
+function renderSpark(points) {
+  const svg = $("#bw-spark");
+  if (points.length < 2) { svg.replaceChildren(); return; }
+  const w = 600, h = 56, pad = 2;
+  const max = Math.max(...points, 1);
+  const step = (w - pad * 2) / (points.length - 1);
+  const coords = points.map((v, i) =>
+    (pad + i * step).toFixed(1) + "," + (h - pad - (v / max) * (h - pad * 2)).toFixed(1)
+  ).join(" ");
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  line.setAttribute("points", coords);
+  line.setAttribute("fill", "none");
+  line.setAttribute("stroke", "currentColor");
+  line.setAttribute("stroke-width", "2");
+  line.setAttribute("stroke-linejoin", "round");
+  line.setAttribute("stroke-linecap", "round");
+  svg.replaceChildren(line);
+}
 function render(d) {
   document.body.classList.remove("stale");
   const pill = $("#overall");
@@ -357,6 +456,17 @@ function render(d) {
   }
   $("#footer").textContent = newest === null ? "Waiting for the first check…" :
     "Last checked " + dur(newest) + " ago · checks run every " + d.interval + "s · DNS test name: " + d.dns_test;
+
+  const bw = d.bandwidth || {};
+  $("#bw-in").textContent = fmtRate(bw.rate_in);
+  $("#bw-out").textContent = fmtRate(bw.rate_out);
+  $("#bw-total").textContent = bw.total_in != null && bw.total_out != null
+    ? fmtBytes(bw.total_in) + " in · " + fmtBytes(bw.total_out) + " out"
+    : (bw.available === false ? "Waiting for the first sample…" : "–");
+  renderSpark(bw.history || []);
+  $("#bw-spark-meta").textContent = bw.history && bw.history.length
+    ? "Combined throughput over the last " + bw.history.length + " checks (every " + d.interval + "s)"
+    : "Combined throughput, most recent checks";
 
   const eps = $("#endpoints");
   eps.replaceChildren();

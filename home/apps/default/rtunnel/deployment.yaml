@@ -80,10 +80,37 @@ spec:
             limits: { memory: 64Mi }
           volumeMounts:
             - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+        - name: netmon
+          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+          command: ["python", "-u", "/app/netmon.py"]
+          env:
+            - { name: PYTHONDONTWRITEBYTECODE, value: "1" }
+          ports:
+            - { name: netmon, containerPort: 8090, protocol: TCP }
+          readinessProbe:
+            httpGet: { path: /healthz, port: netmon }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: netmon }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { memory: 64Mi }
+          volumeMounts:
+            - { name: netmon-app, mountPath: /app, readOnly: true }
       volumes:
         - name: config
           configMap:
             name: *app
+        - name: netmon-app
+          configMap:
+            name: rtunnel-netmon
         - name: rusys
           secret:
             secretName: rtunnel-ssh

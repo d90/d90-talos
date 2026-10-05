@@ -30,6 +30,7 @@ spec:
             - { name: PYTHONDONTWRITEBYTECODE, value: "1" }
             - { name: TUNNEL_HOST, value: rtunnel }
             - { name: LB_IP, value: "10.10.100.102" }
+            - { name: NETMON_URL, value: "http://rtunnel-netmon/metrics" }
           ports:
             - { name: http, containerPort: 8080, protocol: TCP }
           readinessProbe:
