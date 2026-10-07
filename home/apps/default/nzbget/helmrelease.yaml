@@ -19,6 +19,14 @@ spec:
   values:
 
     # ───────────────────────────────────────────────
+    # Init container image: pinned alpine, used to fetch the static 7-Zip
+    # ───────────────────────────────────────────────
+    sevenZipImage:
+      repository: docker.io/library/alpine
+      tag: "3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6"
+      pullPolicy: IfNotPresent
+
+    # ───────────────────────────────────────────────
     # Disable metrics to avoid ServiceMonitor CRDs
     # ───────────────────────────────────────────────
     metrics:
@@ -67,6 +75,18 @@ spec:
         existingClaim: ""
         mountPath: /config
 
+      # Static 7-Zip build, populated by the install-7zip init container
+      sevenzip:
+        enabled: true
+        type: emptyDir
+        mountPath: /opt/7zip
+        targetSelector:
+          main:
+            main:
+              mountPath: /opt/7zip
+            install-7zip:
+              mountPath: /opt/7zip
+
     # ───────────────────────────────────────────────
     # Workload + PRODUCTION-GRADE PROBES
     # ───────────────────────────────────────────────
@@ -80,6 +100,23 @@ spec:
           securityContext:
             container:
               readOnlyRootFilesystem: false
+
+          initContainers:
+            install-7zip:
+              enabled: true
+              type: init
+              imageSelector: sevenZipImage
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+                  # 7-Zip 26.04 static x64 build from https://www.7-zip.org/download.html
+                  cd /tmp
+                  wget -q -O 7z.tar.xz https://www.7-zip.org/a/7z2604-linux-x64.tar.xz
+                  echo "fc0327ba27e89bd086cf426dff17d77de582953cdbbc10a6576540a06853ffcd  7z.tar.xz" | sha256sum -c -
+                  tar -xJf 7z.tar.xz -C /opt/7zip 7zzs
+                  chmod 0755 /opt/7zip/7zzs
 
           containers:
             main:
