@@ -11,7 +11,7 @@ spec:
       template:
         spec:
           containers:
-          - image: docker.io/bshaw/route53-dyndns:5@sha256:9fb45e91a703b2540383cb5f2bec961c459fbe77c1ae847c8d71a03d74966221
+          - image: docker.io/bshaw/route53-dyndns:5@sha256:1a4cd12c77353e678ca0ed061703928a26c87a98d4ac39b9c520b01ad5560460
             name: route53-dyndns
             imagePullPolicy: Always
             envFrom:
