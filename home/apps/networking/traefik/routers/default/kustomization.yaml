@@ -6,6 +6,7 @@ resources:
   - hass.yaml
   - homebox.yaml
   - homepage.yaml
+  - mealie.yaml
   # - jellyfin.yaml
   # - lidarr.yaml
   - netbootxyz.yaml
@@ -13,6 +14,7 @@ resources:
   - peptide-pitstop.yaml
   - profilarr.yaml
   - prowlarr.yaml
+  - qbittorrent.yaml
   - radarr.yaml
   - rtunnel.yaml
   # - scrypted.yaml

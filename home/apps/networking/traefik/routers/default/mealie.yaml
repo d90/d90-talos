@@ -1,0 +1,26 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mealie
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://mealie.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: recipes and meal planning
+    gethomepage.dev/group: Home
+    gethomepage.dev/icon: mealie.png
+    gethomepage.dev/name: mealie
+    gethomepage.dev/pod-selector: ""
+    gethomepage.dev/weight: 20
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`mealie.d90.name`)
+    kind: Rule
+    services:
+    - name: mealie
+      kind: Service
+      port: 10018
+  tls:
+    secretName: tls.mealie
