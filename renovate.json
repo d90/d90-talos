@@ -55,6 +55,13 @@
       ]
     },
     {
+      "description": "Update tdarr server and node together so their versions stay in sync",
+      "matchPackageNames": [
+        "/haveagitgat\\/tdarr/"
+      ],
+      "groupName": "tdarr (server + node)"
+    },
+    {
       "groupName": "cert-manager (chart + CRDs)",
       "matchManagers": [
         "flux",
