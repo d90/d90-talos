@@ -18,7 +18,6 @@ resources:
 - peptide-pitstop
 - profilarr
 - prowlarr
-- qbittorrent
 - radarr
 - rtunnel
 - scrypted

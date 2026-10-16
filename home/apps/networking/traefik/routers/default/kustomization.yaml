@@ -14,7 +14,6 @@ resources:
   - peptide-pitstop.yaml
   - profilarr.yaml
   - prowlarr.yaml
-  - qbittorrent.yaml
   - radarr.yaml
   - rtunnel.yaml
   # - scrypted.yaml
