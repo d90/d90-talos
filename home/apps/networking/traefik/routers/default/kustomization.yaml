@@ -6,6 +6,7 @@ resources:
   - hass.yaml
   - homebox.yaml
   - homepage.yaml
+  - mealie.yaml
   # - jellyfin.yaml
   # - lidarr.yaml
   - netbootxyz.yaml

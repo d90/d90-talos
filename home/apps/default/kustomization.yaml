@@ -9,6 +9,7 @@ resources:
 - homepage-dashboard
 - homeassistant
 - homebox
+- mealie
 # - jellyfin
 # - lidarr
 - mosquitto

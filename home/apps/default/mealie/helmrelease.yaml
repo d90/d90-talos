@@ -1,0 +1,152 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mealie
+  namespace: default
+spec:
+  interval: 5m
+
+  # Inject the database password as a plain value from the SOPS-decrypted
+  # secret — TrueCharts validates that secretKeyRef targets are chart-managed,
+  # so external secret refs must come in via valuesFrom instead.
+  valuesFrom:
+    - kind: Secret
+      name: mealie-postgres-secret
+      valuesKey: password
+      targetPath: workload.main.podSpec.containers.main.env.POSTGRES_PASSWORD
+
+  chart:
+    spec:
+      chart: mealie
+      version: "28.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tc-truecharts
+        namespace: flux-system
+      interval: 1h
+
+  values:
+
+    # ───────────────────────────────────────────────
+    # Disable built-in CNPG — we manage the cluster
+    # externally via database.yaml
+    # ───────────────────────────────────────────────
+    cnpg:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable metrics to avoid ServiceMonitor CRDs
+    # ───────────────────────────────────────────────
+    metrics:
+      main:
+        enabled: false
+        serviceMonitor:
+          enabled: false
+
+    # ───────────────────────────────────────────────
+    # Disable built-in ingress
+    # ───────────────────────────────────────────────
+    ingress:
+      main:
+        enabled: false
+
+    # ───────────────────────────────────────────────
+    # Mealie settings
+    # ───────────────────────────────────────────────
+    mealie:
+      api:
+        general:
+          base_url: "https://mealie.d90.name"
+
+    # ───────────────────────────────────────────────
+    # Service definition
+    # ───────────────────────────────────────────────
+    service:
+      main:
+        enabled: true
+        primary: true
+        ports:
+          main:
+            enabled: true
+            primary: true
+            protocol: http
+            port: 10018
+            targetPort: 10018
+
+    # ───────────────────────────────────────────────
+    # Persistence (recipe images/data)
+    # ───────────────────────────────────────────────
+    persistence:
+      data:
+        enabled: true
+        type: pvc
+        storageClass: nfs-client
+        size: 5Gi
+        existingClaim: ""
+
+    # ───────────────────────────────────────────────
+    # Workload + probes + postgres env vars
+    # ───────────────────────────────────────────────
+    workload:
+      main:
+        type: Deployment
+        enabled: true
+        primary: true
+
+        podSpec:
+          securityContext:
+            container:
+              readOnlyRootFilesystem: false
+
+          containers:
+            main:
+              enabled: true
+              primary: true
+              imageSelector: image
+
+              ports:
+                - name: main
+                  containerPort: 10018
+
+              env:
+                DB_ENGINE: "postgres"
+                POSTGRES_SERVER: "mealie-postgres-rw"
+                POSTGRES_PORT: "5432"
+                POSTGRES_USER: "mealie"
+                POSTGRES_DB: "mealie"
+                # POSTGRES_PASSWORD is injected via valuesFrom above
+
+              probes:
+                readiness:
+                  enabled: true
+                  type: http
+                  path: /api/app/about
+                  port: main
+                  spec:
+                    periodSeconds: 10
+                    timeoutSeconds: 2
+                    failureThreshold: 12
+                    successThreshold: 1
+
+                liveness:
+                  enabled: true
+                  type: http
+                  path: /api/app/about
+                  port: main
+                  spec:
+                    initialDelaySeconds: 30
+                    periodSeconds: 20
+                    timeoutSeconds: 2
+                    failureThreshold: 10
+                    successThreshold: 1
+
+                startup:
+                  enabled: true
+                  type: http
+                  path: /api/app/about
+                  port: main
+                  spec:
+                    periodSeconds: 10
+                    timeoutSeconds: 2
+                    failureThreshold: 90
