@@ -38,7 +38,7 @@ spec:
       containers:
         - imagePullPolicy: IfNotPresent
           name: *app
-          image: ghcr.io/kavo91/peptide-pitstop:1.25.12@sha256:608a0112912279d915b7765294632d113634778fd2b062df49fab8c5abf45476
+          image: ghcr.io/kavo91/peptide-pitstop:1.25.13@sha256:381f080f3556f1b7af21e5ec0d0de5b5570c717433a21753bb4ae591c33bbeea
           securityContext:
             runAsUser: 1001
             runAsGroup: 1001
