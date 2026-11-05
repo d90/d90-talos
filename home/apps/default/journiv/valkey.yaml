@@ -1,0 +1,74 @@
+# Cache / Celery broker for Journiv. Ephemeral (emptyDir): nothing here is
+# authoritative — journal data lives in Postgres and /data.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app journiv-valkey
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: *app
+          image: valkey/valkey:9.0.7-alpine@sha256:2d04268dfa26ab31cfa3fdc538866e76438b2d00e41db41b8cb86d780ac5a416
+          args: ["--save", "", "--appendonly", "no"]
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: valkey
+              containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["valkey-cli", "ping"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["valkey-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+      restartPolicy: Always
+      volumes:
+        - name: data
+          emptyDir: {}
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app journiv-valkey
+  namespace: default
+spec:
+  selector:
+    app: *app
+  ports:
+    - port: &port 6379
+      targetPort: *port
+  type: ClusterIP
