@@ -77,6 +77,10 @@ spec:
             httpGet:
               path: /api/v1/health
               port: http
+              # Journiv rejects unknown Host headers (400); kubelet sends the pod IP.
+              httpHeaders:
+                - name: Host
+                  value: journiv.d90.name
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 60
@@ -84,6 +88,10 @@ spec:
             httpGet:
               path: /api/v1/health
               port: http
+              # Journiv rejects unknown Host headers (400); kubelet sends the pod IP.
+              httpHeaders:
+                - name: Host
+                  value: journiv.d90.name
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -91,6 +99,10 @@ spec:
             httpGet:
               path: /api/v1/health
               port: http
+              # Journiv rejects unknown Host headers (400); kubelet sends the pod IP.
+              httpHeaders:
+                - name: Host
+                  value: journiv.d90.name
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 3
