@@ -54,7 +54,8 @@ spec:
         enabled: true
         type: pvc
         storageClass: nfs-client
-        size: 10Gi
+        # Must match the existing PVC (created at 100Gi); PVCs can't shrink.
+        size: 100Gi
         existingClaim: ""
         mountPath: /data
 
