@@ -1,0 +1,10 @@
+# Root applied by the `flux-system` Kustomization: only what no child
+# Kustomization (crds/core/charts/cilium/networking/apps, see
+# ../flux-system/gotk-sync.yaml) owns — Flux itself and cluster secrets.
+# Do NOT add app/core paths here; that double-applies them and bypasses
+# the dependsOn ordering. (CI still builds ../ as a whole.)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../flux-system
+  - ../config

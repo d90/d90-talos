@@ -13,6 +13,28 @@ spec:
     name: flux-system
   url: ssh://git@github.com/d90/d90-talos.git
 ---
+# Layer 0: Flux itself + cluster secrets (./home/cluster) — nothing else; every
+# other path is owned by exactly one child Kustomization below.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flux-system
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./home/cluster
+  # TEMPORARY: prune stays off while the inventory shrinks from ./home
+  # (218 objects also owned by children) to ./home/cluster. Re-enable in a
+  # follow-up PR once the inventory is verified.
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
 # Layer 1: CRDs — applied first, no dependencies
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
