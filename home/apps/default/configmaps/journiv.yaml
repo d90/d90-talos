@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: journiv
+  namespace: default
+data:
+  ENVIRONMENT: production
+  DOMAIN_NAME: journiv.d90.name
+  DOMAIN_SCHEME: https
+  TZ: America/New_York
+  # Postgres via CNPG (database.yaml); POSTGRES_PASSWORD comes from journiv-postgres-secret
+  DB_DRIVER: postgres
+  POSTGRES_HOST: journiv-postgres-rw
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: journiv
+  POSTGRES_DB: journiv
+  # Valkey (valkey.yaml) — cache, rate limiting, Celery broker/results, redbeat schedule
+  REDIS_URL: redis://journiv-valkey:6379/0
+  CELERY_BROKER_URL: redis://journiv-valkey:6379/0
+  CELERY_RESULT_BACKEND: redis://journiv-valkey:6379/0
+  RATE_LIMIT_STORAGE_URI: redis://journiv-valkey:6379/1
+  REDBEAT_REDIS_URL: redis://journiv-valkey:6379/2

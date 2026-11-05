@@ -1,0 +1,139 @@
+# Celery worker: media processing, imports/exports. Shares /data with the app.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app journiv-celery-worker
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: fix-data-perms
+          image: busybox:1.38
+          command: ["chown", "-R", "1000:1000", "/data"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN"]
+          volumeMounts:
+            - name: nfs-conf
+              mountPath: /data
+              subPath: journiv/
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: *app
+          image: swalabtech/journiv-app:0.1.0-beta.26@sha256:e38be70af0e8ef2a046baa4eefbe2caf6ed177848b18dec454e8770d0b03791d
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            # The image entrypoint picks the process from SERVICE_ROLE; don't set
+            # command/args, or it will also run migrations.
+            - name: SERVICE_ROLE
+              value: celery-worker
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: journiv-postgres-secret
+                  key: password
+          envFrom:
+            - prefix: ''
+              configMapRef:
+                name: journiv
+                optional: false
+            - prefix: ''
+              secretRef:
+                name: journiv-secret
+                optional: false
+          volumeMounts:
+            - name: nfs-conf
+              mountPath: /data
+              subPath: journiv/
+      restartPolicy: Always
+      volumes:
+        - name: nfs-conf
+          persistentVolumeClaim:
+            claimName: nfs-pvc-containerdata
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+---
+# Celery beat: periodic tasks (redbeat scheduler, state in Valkey).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app journiv-celery-beat
+  annotations:
+    {}
+  labels:
+    app: *app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: *app
+          image: swalabtech/journiv-app:0.1.0-beta.26@sha256:e38be70af0e8ef2a046baa4eefbe2caf6ed177848b18dec454e8770d0b03791d
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            # The image entrypoint picks the process from SERVICE_ROLE; don't set
+            # command/args, or it will also run migrations.
+            - name: SERVICE_ROLE
+              value: celery-beat
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: journiv-postgres-secret
+                  key: password
+          envFrom:
+            - prefix: ''
+              configMapRef:
+                name: journiv
+                optional: false
+            - prefix: ''
+              secretRef:
+                name: journiv-secret
+                optional: false
+      restartPolicy: Always
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate

@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: journiv
+  namespace: default
+  annotations:
+    gethomepage.dev/href: "https://journiv.d90.name"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: private journal
+    gethomepage.dev/group: Home
+    gethomepage.dev/icon: mdi-notebook-edit
+    gethomepage.dev/name: Journiv
+    gethomepage.dev/pod-selector: ""
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`journiv.d90.name`)
+    kind: Rule
+    services:
+    - name: journiv
+      kind: Service
+      port: 8000
+  tls:
+    secretName: tls.journiv

@@ -1,0 +1,21 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: journiv-postgres
+  namespace: default
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  storage:
+    storageClass: nfs-client
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: journiv
+      owner: journiv
+      secret:
+        name: journiv-postgres-secret
+  superuserSecret:
+    name: journiv-postgres-secret
+  monitoring:
+    enablePodMonitor: true
