@@ -85,6 +85,20 @@
       "addLabels": [
         "fluxcd"
       ]
+    },
+    {
+      "description": "CNPG operator: never automerge; one PR per minor (upstream recommends upgrading one minor at a time). Every bump rolls all Postgres instances.",
+      "matchDepNames": [
+        "cloudnative-pg/cloudnative-pg"
+      ],
+      "automerge": false,
+      "separateMultipleMinor": true,
+      "addLabels": [
+        "cnpg"
+      ],
+      "prBodyNotes": [
+        "Upgrade one minor at a time and read https://cloudnative-pg.io/documentation/current/installation_upgrade/ for every intermediate minor. Take fresh pg_dump backups first; merging rolls every Postgres instance."
+      ]
     }
   ],
   "customManagers": [
@@ -98,6 +112,20 @@
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "cert-manager/cert-manager"
+    },
+    {
+      "customType": "regex",
+      "description": "CloudNativePG operator release manifest (version appears in both the branch and file name)",
+      "managerFilePatterns": [
+        "/(^|/)kustomization\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "https://raw\\.githubusercontent\\.com/cloudnative-pg/cloudnative-pg/release-\\d+\\.\\d+/releases/cnpg-(?<currentValue>\\d+\\.\\d+\\.\\d+)\\.yaml"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "cloudnative-pg/cloudnative-pg",
+      "extractVersionTemplate": "^v(?<version>.*)$",
+      "autoReplaceStringTemplate": "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-{{{replace '\\.\\d+$' '' newValue}}}/releases/cnpg-{{{newValue}}}.yaml"
     },
     {
       "customType": "regex",
