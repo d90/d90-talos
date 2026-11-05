@@ -23,10 +23,7 @@ metadata:
 spec:
   interval: 10m0s
   path: ./home/cluster
-  # TEMPORARY: prune stays off while the inventory shrinks from ./home
-  # (218 objects also owned by children) to ./home/cluster. Re-enable in a
-  # follow-up PR once the inventory is verified.
-  prune: false
+  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
