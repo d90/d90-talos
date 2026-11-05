@@ -8,7 +8,7 @@ resources:
   # - tls.yaml
   # Upgrade one minor at a time (upstream recommendation) and read the
   # release notes / installation_upgrade.md for every intermediate minor.
-  - https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.25/releases/cnpg-1.25.4.yaml
+  - https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.26/releases/cnpg-1.26.3.yaml
 patches:
   # Safety: never let Flux prune the CNPG CRDs (e.g. if the line above is
   # removed/commented). Deleting a CRD cascade-deletes every Cluster and,
