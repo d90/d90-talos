@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: tasmoadmin
-      version: "14.0.4"
+      version: "14.1.0"
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
