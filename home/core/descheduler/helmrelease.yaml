@@ -23,9 +23,6 @@ spec:
     deschedulingInterval: 10m
     cmdOptions:
       v: 3
-      # TEMPORARY: log what would be evicted without evicting. Flip off after
-      # reviewing `kubectl -n kube-system logs deploy/descheduler`.
-      dry-run: true
     resources:
       requests:
         cpu: 10m
@@ -48,6 +45,16 @@ spec:
                 # Leave pods alone right after they (re)started, e.g. just
                 # after a node reboot, so the scheduler settles first.
                 minPodAge: 30m
+                # Never pick a Postgres primary. Their CNPG PDBs would refuse
+                # the eviction anyway, but the descheduler would retry them
+                # every cycle and waste its 5 slots (dry-run picked
+                # journiv-postgres-1 first). Replicas may still move.
+                labelSelector:
+                  matchExpressions:
+                    - key: cnpg.io/instanceRole
+                      operator: NotIn
+                      values:
+                        - primary
                 podProtections:
                   # emptyDir pods (most TrueCharts apps, journiv-valkey) may move.
                   # NOT enabling PodsWithPVC: nearly every app has an NFS PVC,
