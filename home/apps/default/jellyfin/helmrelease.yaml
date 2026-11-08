@@ -17,6 +17,11 @@ spec:
       interval: 1h0m0s
 
   values:
+    podOptions:
+      # TrueCharts' default affinity requires co-location with ANY pod whose PVC
+      # has the same short name (e.g. every app's 'config'), chaining unrelated
+      # apps to one node. Pointless on NFS; blocks the descheduler from rebalancing.
+      defaultAffinity: false
     # ─── Disable built-in ingress via ingress.main ─── #
     ingress:
       main:
@@ -101,10 +106,6 @@ spec:
               primary: true
               imageSelector: image
 
-              # Define the HTTP port
-              ports:
-                - name: main
-                  containerPort: 8096
 
               # Probes using the TrueCharts common-library DSL
               probes:
