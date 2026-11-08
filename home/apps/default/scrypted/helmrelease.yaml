@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: scrypted
-      version: "9.0.4" # Ensure this matches the available scrypted chart version in your repo
+      version: "9.1.2" # Ensure this matches the available scrypted chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
