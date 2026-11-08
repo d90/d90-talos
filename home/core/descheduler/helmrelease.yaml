@@ -11,7 +11,7 @@ spec:
     spec:
       chart: *app
       # Keep the minor in step with the Kubernetes minor (1.35 -> 0.35.x).
-      version: 0.35.1
+      version: 0.37.0
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
