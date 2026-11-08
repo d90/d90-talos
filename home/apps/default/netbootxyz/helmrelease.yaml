@@ -15,6 +15,11 @@ spec:
         namespace: flux-system
       interval: 1h
   values:
+    podOptions:
+      # TrueCharts' default affinity requires co-location with ANY pod whose PVC
+      # has the same short name (e.g. every app's 'config'), chaining unrelated
+      # apps to one node. Pointless on NFS; blocks the descheduler from rebalancing.
+      defaultAffinity: false
 
     # ───────────────────────────────────────────────
     # Disable metrics to avoid ServiceMonitor CRDs
@@ -22,8 +27,6 @@ spec:
     metrics:
       main:
         enabled: false
-        serviceMonitor:
-          enabled: false
 
     # ───────────────────────────────────────────────
     # Disable built-in ingress
@@ -107,15 +110,6 @@ spec:
         enabled: true
         primary: true
         podSpec:
-          securityContext:
-            container:
-              readOnlyRootFilesystem: false
-              runAsNonRoot: false
-              runAsUser: 0
-              runAsGroup: 0
-              capabilities:
-                add:
-                  - SYS_CHROOT
           containers:
             main:
               enabled: true
@@ -125,14 +119,6 @@ spec:
                 MENU_VERSION: ""
                 TFTPD_OPTS: "--tftp-single-port"
                 LIVE_ENDPOINT: "http://10.10.100.109"
-              ports:
-                - name: main
-                  containerPort: 3000
-                - name: assets
-                  containerPort: 80
-                - name: tftp
-                  containerPort: 69
-                  protocol: udp
               probes:
                 readiness:
                   enabled: true

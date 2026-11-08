@@ -17,6 +17,11 @@ spec:
       interval: 1h
 
   values:
+    podOptions:
+      # TrueCharts' default affinity requires co-location with ANY pod whose PVC
+      # has the same short name (e.g. every app's 'config'), chaining unrelated
+      # apps to one node. Pointless on NFS; blocks the descheduler from rebalancing.
+      defaultAffinity: false
     image:
       repository: docker.io/koush/scrypted
       tag: v0.123.58-jammy-full@sha256:d84d2a8cc897e3ddd0635aecb681900f551e3f5bf702200df4b92e4014bc22b3

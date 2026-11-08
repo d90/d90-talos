@@ -228,6 +228,10 @@ spec:
         primary: true
     
     podOptions:
+      # TrueCharts' default affinity requires co-location with ANY pod whose PVC
+      # has the same short name (e.g. every app's 'config'), chaining unrelated
+      # apps to one node. Pointless on NFS; blocks the descheduler from rebalancing.
+      defaultAffinity: false
       dnsConfig:
         options:
           - name: ndots

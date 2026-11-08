@@ -17,6 +17,11 @@ spec:
       interval: 1h
 
   values:
+    podOptions:
+      # TrueCharts' default affinity requires co-location with ANY pod whose PVC
+      # has the same short name (e.g. every app's 'config'), chaining unrelated
+      # apps to one node. Pointless on NFS; blocks the descheduler from rebalancing.
+      defaultAffinity: false
 
     # ───────────────────────────────────────────────
     # Disable metrics to avoid ServiceMonitor CRDs
@@ -24,8 +29,6 @@ spec:
     metrics:
       main:
         enabled: false
-        serviceMonitor:
-          enabled: false
 
     # ───────────────────────────────────────────────
     # Disable built-in ingress
@@ -77,9 +80,6 @@ spec:
         enabled: true
         primary: true
         podSpec:
-          securityContext:
-            container:
-              readOnlyRootFilesystem: false
 
           containers:
             main:
@@ -94,9 +94,6 @@ spec:
                 POSTGRES_HOST: "bazarr-postgres-rw"
               # Correct container port
 
-              ports:
-                - name: main
-                  containerPort: 6767 # Changed for bazarr
 
               # ───────────────────────────────────────
               # STABLE PROBES FOR NFS + LARGE LIBRARIES
@@ -109,10 +106,11 @@ spec:
                   type: http
                   path: /
                   port: main
-                  periodSeconds: 10
-                  timeoutSeconds: 2
-                  failureThreshold: 12   # ~2 minutes
-                  successThreshold: 1
+                  spec:
+                    periodSeconds: 10
+                    timeoutSeconds: 2
+                    failureThreshold: 12   # ~2 minutes
+                    successThreshold: 1
 
                 # Liveness probe must be gentle — bazarr can stall briefly
                 liveness:
@@ -120,11 +118,12 @@ spec:
                   type: http
                   path: /
                   port: main
-                  initialDelaySeconds: 30
-                  periodSeconds: 20
-                  timeoutSeconds: 2
-                  failureThreshold: 10   # ~3 minutes
-                  successThreshold: 1
+                  spec:
+                    initialDelaySeconds: 30
+                    periodSeconds: 20
+                    timeoutSeconds: 2
+                    failureThreshold: 10   # ~3 minutes
+                    successThreshold: 1
 
                 # Startup probe prevents container kills during long boot
                 startup:
@@ -132,9 +131,10 @@ spec:
                   type: http
                   path: /
                   port: main
-                  periodSeconds: 10
-                  timeoutSeconds: 2
-                  failureThreshold: 90   # 15 minutes startup window
+                  spec:
+                    periodSeconds: 10
+                    timeoutSeconds: 2
+                    failureThreshold: 90   # 15 minutes startup window
   postRenderers:
       - kustomize:
           patches:
