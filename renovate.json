@@ -19,6 +19,13 @@
       "/^home\\/(apps|core)\\/.+\\.ya?ml$/"
     ]
   },
+  "flux": {
+    "managerFilePatterns": [
+      "/(?:^|/)gotk-components\\.ya?ml$/",
+      "/^home\\/charts\\/descheduler\\.ya?ml$/",
+      "/^home\\/core\\/descheduler\\/.+\\.ya?ml$/"
+    ]
+  },
   "packageRules": [
     {
       "description": "Never automerge major updates - leave these for manual review",
@@ -99,6 +106,34 @@
       "prBodyNotes": [
         "Upgrade one minor at a time and read https://cloudnative-pg.io/documentation/current/installation_upgrade/ for every intermediate minor. Take fresh pg_dump backups first; merging rolls every Postgres instance."
       ]
+    },
+    {
+      "description": "descheduler: own group (not the fluxcd group); keep its minor in step with the Kubernetes minor (0.35.x <-> k8s 1.35)",
+      "matchManagers": [
+        "flux"
+      ],
+      "matchPackageNames": [
+        "descheduler"
+      ],
+      "groupName": "descheduler",
+      "groupSlug": "descheduler",
+      "addLabels": [
+        "descheduler"
+      ]
+    },
+    {
+      "description": "descheduler minor/major bumps wait for review (check Kubernetes version compatibility); patches automerge",
+      "matchManagers": [
+        "flux"
+      ],
+      "matchPackageNames": [
+        "descheduler"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "automerge": false
     }
   ],
   "customManagers": [
