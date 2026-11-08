@@ -7,6 +7,7 @@ resources:
 # - bjw-s-charts.yaml
 - cloudnative-pg-charts.yaml
 - databasus.yaml
+- descheduler.yaml
 - jetstack.yaml
 - nfs-subdir-external-provisioner.yaml
 - prometheus-community.yaml

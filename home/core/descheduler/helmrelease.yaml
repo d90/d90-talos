@@ -1,0 +1,90 @@
+---
+# Rebalances pods after a node reboot. Kubernetes never moves running pods on
+# its own, so after talos01/talos02 restarts everything piles onto the survivor.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app descheduler
+  namespace: kube-system
+spec:
+  chart:
+    spec:
+      chart: *app
+      # Keep the minor in step with the Kubernetes minor (1.35 -> 0.35.x).
+      version: 0.35.1
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: descheduler
+        namespace: flux-system
+  interval: 1h
+  values:
+    kind: Deployment
+    deschedulingInterval: 10m
+    cmdOptions:
+      v: 3
+      # TEMPORARY: log what would be evicted without evicting. Flip off after
+      # reviewing `kubectl -n kube-system logs deploy/descheduler`.
+      dry-run: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
+    deschedulerPolicy:
+      # talos03 is a tainted 2 CPU / 4 GiB etcd-only node: never count it as
+      # room to move pods to. Only talos01/talos02 are balanced.
+      nodeSelector: kubernetes.io/hostname!=talos03
+      # Single-replica apps restart when evicted: move a few at a time.
+      maxNoOfPodsToEvictPerNode: 5
+      maxNoOfPodsToEvictTotal: 5
+      profiles:
+        - name: default
+          pluginConfig:
+            - name: DefaultEvictor
+              args:
+                nodeFit: true
+                # Leave pods alone right after they (re)started, e.g. just
+                # after a node reboot, so the scheduler settles first.
+                minPodAge: 30m
+                podProtections:
+                  # emptyDir pods (most TrueCharts apps, journiv-valkey) may move.
+                  # NOT enabling PodsWithPVC: nearly every app has an NFS PVC,
+                  # which follows the pod to any node. Postgres primaries are
+                  # protected by their CNPG PodDisruptionBudgets (0 disruptions).
+                  defaultDisabled:
+                    - PodsWithLocalStorage
+            - name: RemoveDuplicates
+            - name: RemovePodsViolatingNodeAffinity
+              args:
+                nodeAffinityType:
+                  - requiredDuringSchedulingIgnoredDuringExecution
+            - name: RemovePodsViolatingNodeTaints
+            - name: RemovePodsViolatingInterPodAntiAffinity
+            - name: LowNodeUtilization
+              args:
+                evictableNamespaces:
+                  exclude:
+                    - kube-system
+                    - flux-system
+                # % of requests (cpu/memory) and of the 110-pod limit.
+                # Under = below ALL of these; over = above ANY targetThreshold.
+                thresholds:
+                  cpu: 20
+                  memory: 20
+                  pods: 25
+                targetThresholds:
+                  cpu: 50
+                  memory: 50
+                  pods: 35
+          plugins:
+            balance:
+              enabled:
+                - RemoveDuplicates
+                - LowNodeUtilization
+            deschedule:
+              enabled:
+                - RemovePodsViolatingNodeTaints
+                - RemovePodsViolatingNodeAffinity
+                - RemovePodsViolatingInterPodAntiAffinity
