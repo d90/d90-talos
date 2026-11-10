@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: home-assistant
-      version: "32.2.2" # Ensure this matches the available homeassistant chart version in your repo
+      version: "32.2.5" # Ensure this matches the available homeassistant chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
