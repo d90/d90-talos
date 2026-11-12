@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: mosquitto
-      version: "19.1.2" # Ensure this matches the available mosquitto chart version in your repo
+      version: "19.1.4" # Ensure this matches the available mosquitto chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
