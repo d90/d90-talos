@@ -29,7 +29,7 @@ spec:
         - name: ssh
           image: kroniak/ssh-client:3.23@sha256:cfb58718a2cfbb248214a9c33655f16438e0f1014c054e0e524d3eb232ccdb2b
           command: ["ssh"]
-          args: ["-N", "-F", "/etc/rtunnel/ssh_config", "rutgers"]
+          args: ["-N", "-F", "/etc/rtunnel-ssh/ssh_config", "rutgers"]
           ports:
             - { name: smb, containerPort: 4445, protocol: TCP }
             - { name: rdp, containerPort: 3390, protocol: TCP }
@@ -51,7 +51,7 @@ spec:
             requests: { cpu: 10m, memory: 16Mi }
             limits: { memory: 64Mi }
           volumeMounts:
-            - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+            - { name: ssh-config, mountPath: /etc/rtunnel-ssh, readOnly: true }
             - { name: rusys, mountPath: /etc/rtunnel-key, readOnly: true }
         - name: dns
           image: coredns/coredns:1.15.0@sha256:0a9d8c8ddf34347eb59aad9a8784f0710de88d6d112726d11d271f9bc6daca26
@@ -61,6 +61,7 @@ spec:
             - { name: udns-tcp, containerPort: 5353, protocol: TCP }
             - { name: unbound-udp, containerPort: 5354, protocol: UDP }
             - { name: unbound-tcp, containerPort: 5354, protocol: TCP }
+            - { name: unbound-doh, containerPort: 8443, protocol: TCP }
           readinessProbe:
             tcpSocket: { port: udns-tcp }
             periodSeconds: 10
@@ -80,6 +81,7 @@ spec:
             limits: { memory: 64Mi }
           volumeMounts:
             - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+            - { name: doh-tls, mountPath: /etc/rtunnel-doh-tls, readOnly: true }
         - name: netmon
           image: python:3.15-alpine@sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
           command: ["python", "-u", "/app/netmon.py"]
@@ -111,8 +113,16 @@ spec:
         - name: netmon-app
           configMap:
             name: rtunnel-netmon
+        - name: doh-tls
+          secret:
+            secretName: tls.rtunnel-lb
         - name: rusys
           secret:
             secretName: rtunnel-ssh
             # ssh only enforces 0600 when the file owner is the running uid; kubelet makes it root:fsGroup, so 0440 + fsGroup works
+            defaultMode: 0440
+        - name: ssh-config
+          secret:
+            secretName: rtunnel-ssh-config
+            # same as rusys: kubelet makes the files root:fsGroup, so 0440 + fsGroup lets uid 65534 read them
             defaultMode: 0440
