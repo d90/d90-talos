@@ -39,3 +39,11 @@ data:
             force_tcp
         }
     }
+    # unbound over DoH (https://rtunnel-lb.d90.name:8443/dns-query) for browsers
+    https://.:8443 {
+        tls /etc/rtunnel-doh-tls/tls.crt /etc/rtunnel-doh-tls/tls.key
+        errors
+        forward . 127.0.0.1:5302 {
+            force_tcp
+        }
+    }

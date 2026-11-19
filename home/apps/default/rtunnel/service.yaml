@@ -17,3 +17,4 @@ spec:
     - { name: udns-tcp, port: 5353, targetPort: 5353, protocol: TCP }
     - { name: unbound-udp, port: 5354, targetPort: 5354, protocol: UDP }
     - { name: unbound-tcp, port: 5354, targetPort: 5354, protocol: TCP }
+    - { name: unbound-doh, port: 8443, targetPort: 8443, protocol: TCP }
