@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - tls.yaml
 - helmrelease.yaml
+- secret.values.sops.yaml

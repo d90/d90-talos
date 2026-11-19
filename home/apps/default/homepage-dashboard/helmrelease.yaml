@@ -15,7 +15,15 @@ spec:
         name: tc-truecharts
         namespace: flux-system
       interval: 1h
-      
+
+  # bookmarks.yaml + services.yaml hold private endpoints; they live in the
+  # SOPS-encrypted secret.values.sops.yaml. valuesFrom is merged BEFORE
+  # spec.values, so those keys must not also be defined inline below.
+  valuesFrom:
+    - kind: Secret
+      name: homepage-values
+      valuesKey: values.yaml
+
   values:
     image:
       repository: ghcr.io/gethomepage/homepage
@@ -365,206 +373,7 @@ spec:
                 columns: 2
           custom.css: ""
           custom.js: ""
-          bookmarks.yaml: |
-            - Medical:
-                - Summit Portal:
-                    - abbr: SHP
-                      href: https://2983-1.portal.athenahealth.com/
-          services.yaml: |
-            - Paul: 
-                - Jellyfin:
-                    href: https://jellyfin.epicfailonline.com
-                    icon: sh-jellyfin
-            - Useful Links: 
-                - Samsung SSD Warranty Claim:
-                    href: http://care.us.samsung.com/r/ZLpBpNHQ0
-                - Selfhost Icons:
-                    href: https://selfh.st/icons/
-                    icon: selfh-st
-            - Hypervisor:
-                - PVE:
-                    href: https://pve.d90.name:8006/
-                    icon: sh-proxmox
-                    siteMonitor: https://pve01.d90.name:8006/
-                - PVE2:
-                    href: https://pve02.d90.name:8006/
-                    icon: sh-proxmox
-                    siteMonitor: https://pve02.d90.name:8006/
-            - Network:
-                - OpnSense:
-                    href: https://home.nickdininno.com
-                    icon: sh-opnsense
-            - Streaming:
-                - Netflix: 
-                    href: https://netflix.com
-                    icon: sh-netflix
-                - Amazon Prime: 
-                    href: https://www.amazon.com/gp/video/storefront
-                    icon: sh-amazon-prime
-                - Disney +: 
-                    href: https://www.disneyplus.com/
-                    icon: sh-disney-plus
-            - Pictures: 
-                - Google Photos:
-                    href: https://photos.google.com/
-                    icon: sh-google-photos
-                - Amazon Photos: 
-                    href: https://www.amazon.com/photos
-                    icon: sh-amazon
-            - Most Used: 
-                - Netbox: 
-                    icon: sh-netbox
-                    href: https://netbox.ei.rutgers.edu/
-                - Rundeck:
-                    icon: sh-rundeck
-                    href: http://rundeck.ei.rutgers.edu/       
-                - SNow:
-                    icon: https://upload.wikimedia.org/wikipedia/commons/b/b6/Rutgers_Scarlet_Knights_logo.svg
-                    href: https://rutgers.service-now.com/  
-                - Dev Netbox: 
-                    icon: sh-netbox
-                    href: https://dev-netbox.ei.rutgers.edu/
-                - Argo-CD:
-                    icon: sh-argo-cd
-                    href: https://argo-netbox.apps.ocp.ei.rutgers.edu/                                                     
-            - DC Load Balancers:
-                - ASB1:
-                    icon: /images/icons/a10.svg
-                    href: https://a10-asb-1.ei.rutgers.edu/
-                - AWS1:
-                    icon: /images/icons/a10.svg
-                    href: https://a10-aws-1.ei.rutgers.edu/          
-                - KB1:
-                    icon: /images/icons/a10.svg
-                    href: https://a10-kb-1.ei.rutgers.edu/
-                - SG:
-                    icon: /images/icons/a10.svg
-                    href: https://a10-sg-1.ei.rutgers.edu/        
-                - ASB1:
-                    icon: /images/icons/f5.svg
-                    href: https://f5-asb-1.ei.rutgers.edu/
-                - AWS1:
-                    icon: /images/icons/f5.svg
-                    href: https://f5-aws-1.ei.rutgers.edu/          
-                - KB1:
-                    icon: /images/icons/f5.svg
-                    href: https://f5-kb-1.ei.rutgers.edu/
-                - SG:
-                    icon: /images/icons/f5.svg
-                    href: https://f5-sg-1.ei.rutgers.edu/
-            - Kemp Load Balancers:
-                - asb-1-a:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-1-a-asb-mgmt.ei.rutgers.edu
-                - asb-1-b:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-1-b-asb-mgmt.ei.rutgers.edu
-                - asb-2-a:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-2-a-asb-mgmt.ei.rutgers.edu
-                - asb-2-b:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-2-b-asb-mgmt.ei.rutgers.edu
-                - knb-1-a:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-1-a-knb-mgmt.ei.rutgers.edu
-                - knb-1-b:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-1-b-knb-mgmt.ei.rutgers.edu
-                - knb-2-a:
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-2-a-knb-mgmt.ei.rutgers.edu
-                - knb-2-b:       
-                    icon: /images/icons/kemp.png
-                    href: https://kempecm-2-b-knb-mgmt.ei.rutgers.edu
-            - Information: 
-                - Sharepoint: 
-                    icon: sh-microsoft-sharepoint
-                    href: https://rutgersconnect-my.sharepoint.com/
-                - EI-Docs: 
-                    icon: https://upload.wikimedia.org/wikipedia/commons/b/b6/Rutgers_Scarlet_Knights_logo.svg
-                    href: https://ei-docs.apps.ocp.ei.rutgers.edu/          
-                - Wiki: 
-                    icon: sh-wikipedia
-                    href: https://wiki.ei.rutgers.edu/index.php?title=Special:UserLogin
-            - Tools:   
-                - Vaultwarden: 
-                    icon: sh-vaultwarden
-                    href: https://vaultwarden.ei.rutgers.edu
-                - Vault:
-                    icon: sh-hashicorp-vault
-                    href: https://vault-api.ei.rutgers.edu/ 
-                - Dev Spaces:
-                    icon: /images/icons/devSpaces.png
-                    href: https://devspaces.apps.ocp.ei.rutgers.edu/dashboard
-                - OpenShift: 
-                    icon: /images/icons/openshift.png
-                    href: https://console.ei.rutgers.edu     
-                - Gitlab: 
-                    icon: sh-gitlab
-                    href: https://gitlab.rutgers.edu/
-                - CyberArk PAM: 
-                    icon: /images/icons/poo.svg
-                    href: https://rutgerspams.cyberark.cloud/
-                - Infoblox: 
-                    icon: /images/icons/infoblox.png
-                    href: https://hostmaster.td.rutgers.edu/ui/
-                - IT Tools: 
-                    icon: /images/icons/it-tools.png
-                    href: https://tools.apps.ocp.ei.rutgers.edu/
-                - WebNetTools:
-                    icon: /images/icons/wnt.png
-                    href: http://lg.apps.ocp.ei.rutgers.edu/
-                - Juniper Apstra:
-                    icon: /images/icons/apstra.png
-                    href: https://apstra.ei.rutgers.edu/#/blueprints
-            - Cluster Management: 
-                - Github d90/homelab editor:
-                    icon: /images/icons/github-mark-white.png
-                    href: https://github.dev/d90/d90-talos
-                - Github d90/homelab:
-                    icon: /images/icons/github-mark-white.png
-                    href: https://github.com/d90/d90-talos
-            - Tech Resources:
-                - Truecharts: 
-                    icon: /images/icons/trueforge.svg
-                    href: https://truecharts.org/truetech/truecharts/charts/description-list/
-                - Gemini:
-                    icon: sh-google-gemini
-                    href: https://gemini.google.com
-                - ChatGPT:
-                    icon: sh-chatgpt
-                    href: https://chatgpt.com/
-                - Techno Tim:
-                    icon: /images/icons/techno-tim.jpg
-                    href: https://technotim.live/
-                - LSIO Fleet:
-                    icon: sh-linuxserver-io
-                    href: https://fleet.linuxserver.io/
-                - Mend Renovate:
-                    icon: si-renovate
-                    href: https://developer.mend.io/github/d90/d90-talos
-                - Proxmox VE Helper-Scripts:
-                    icon: /images/icons/helper-scripts.png
-                    href: https://github.com/community-scripts/ProxmoxVE
-            - Build Guides: 
-                - Huntress:
-                    icon: /images/icons/huntress.png
-                    href: https://maxroll.gg/poe2/build-guides/bleed-rake-amazon-build-guide
-            - Resources: 
-                - Maxroll.gg:
-                    icon: /images/icons/maxroll.png
-                    href: https://maxroll.gg/poe2
-                - Trade Site:
-                    icon: /images/icons/PoE-trade.png
-                    href: https://www.pathofexile.com/trade2/search/poe2/Standard       
-                - mmoexp:
-                    icon: /images/icons/mmoexp.png
-                    href: https://www.mmoexp.com/Poe-2.html 
-            - Repositories:
-                - Netbox Custom Objects:
-                    icon: sh-netbox
-                    href: https://github.com/netboxlabs/netbox-custom-objects
+          # bookmarks.yaml + services.yaml come from the SOPS secret homepage-values (valuesFrom)
           widgets.yaml: |
             - kubernetes:
                 cluster:
@@ -635,4 +444,4 @@ spec:
               - customresourcedefinitions/status
             verbs:
               - get
-      
+      
