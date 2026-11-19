@@ -22,6 +22,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
         runAsGroup: 65534
+        # secret volume files are root:fsGroup 0440; without fsGroup uid 65534 can't read them
+        fsGroup: 65534
       containers:
         - name: status
           image: python:3.15-alpine@sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
@@ -31,6 +33,10 @@ spec:
             - { name: TUNNEL_HOST, value: rtunnel }
             - { name: LB_IP, value: "10.10.100.102" }
             - { name: NETMON_URL, value: "http://rtunnel-netmon/metrics" }
+            - { name: SSH_CONFIG, value: /etc/rtunnel-ssh/ssh_config }
+            - name: DNS_TEST_NAME
+              valueFrom:
+                secretKeyRef: { name: rtunnel-ssh-config, key: dns_test_name }
           ports:
             - { name: http, containerPort: 8080, protocol: TCP }
           readinessProbe:
@@ -50,11 +56,12 @@ spec:
             limits: { memory: 96Mi }
           volumeMounts:
             - { name: app, mountPath: /app, readOnly: true }
-            - { name: config, mountPath: /etc/rtunnel, readOnly: true }
+            - { name: ssh-config, mountPath: /etc/rtunnel-ssh, readOnly: true }
       volumes:
         - name: app
           configMap:
             name: rtunnel-status
-        - name: config
-          configMap:
-            name: rtunnel
+        - name: ssh-config
+          secret:
+            secretName: rtunnel-ssh-config
+            defaultMode: 0440

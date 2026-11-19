@@ -13,9 +13,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HOST = os.environ.get("TUNNEL_HOST", "rtunnel")
 LB_IP = os.environ.get("LB_IP", "")
-DNS_NAME = os.environ.get("DNS_TEST_NAME", "rutgers.edu")
+DNS_NAME = os.environ.get("DNS_TEST_NAME", "example.com")
 INTERVAL = int(os.environ.get("CHECK_INTERVAL", "30"))
-SSH_CONFIG = os.environ.get("SSH_CONFIG", "/etc/rtunnel/ssh_config")
+SSH_CONFIG = os.environ.get("SSH_CONFIG", "/etc/rtunnel-ssh/ssh_config")
 NETMON_URL = os.environ.get("NETMON_URL", "http://rtunnel-netmon/metrics")
 LISTEN_PORT = int(os.environ.get("PORT", "8080"))
 TIMEOUT = 6
