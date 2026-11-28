@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: nzbget
-      version: "31.1.5" # Ensure this matches the available nzbget chart version in your repo
+      version: "32.0.0" # Ensure this matches the available nzbget chart version in your repo
       sourceRef:
         kind: HelmRepository
         name: tc-truecharts
